@@ -2,6 +2,7 @@
 DSL/
 proxy/
 server/
+shared
 
 # Python
 __pycache__/
