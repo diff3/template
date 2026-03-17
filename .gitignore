@@ -1,0 +1,16 @@
+# Ignore cloned repos
+DSL/
+proxy/
+server/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Env files (optional, om du inte vill committa .env)
+# .env
+
+# OS junk
+.DS_Store
+Thumbs.db
