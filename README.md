@@ -1,93 +1,74 @@
-# Project Template
+# PyPandariaEmu
 
-Minimal workspace for running proxy + server + DSL together.
+Workspace containing the DSL runtime, proxy, authserver and worldserver.
 
-## Structure
+## Layout
 
-    .
-    ├── .env
-    ├── authserver.py
-    ├── proxyserver.py
-    ├── worldserver.py
-    ├── DSL/
-    ├── proxy/
-    ├── server/
-    └── common/
+```text
+.
+├── authserver.py
+├── worldserver.py
+├── proxyserver.py
+├── DSL/
+├── proxy/
+├── server/
+├── shared/
+├── config/
+├── data/
+└── logs/
+```
 
----
+## Configuration
 
-## Setup
+YAML config files live in `config/`:
 
-Clone required repositories:
+- [/home/magnus/projects/PyPandariaEmu/config/default.yaml](/home/magnus/projects/PyPandariaEmu/config/default.yaml)
+- [/home/magnus/projects/PyPandariaEmu/config/authserver.yaml](/home/magnus/projects/PyPandariaEmu/config/authserver.yaml)
+- [/home/magnus/projects/PyPandariaEmu/config/worldserver.yaml](/home/magnus/projects/PyPandariaEmu/config/worldserver.yaml)
+- [/home/magnus/projects/PyPandariaEmu/config/client.yaml](/home/magnus/projects/PyPandariaEmu/config/client.yaml)
 
-    git clone https://github.com/diff3/BinaryPacketsDSL.git DSL
-    git clone https://github.com/diff3/SwitchboardProxy.git proxy
-    git clone https://github.com/diff3/PyPandaria.git server
-    git clone https://github.com/diff3/shared.git common
+The proxy keeps its own JSON config, but it is now also stored under `config/`:
 
-Place them in this directory so the structure matches above.
+- [/home/magnus/projects/PyPandariaEmu/config/proxy.json](/home/magnus/projects/PyPandariaEmu/config/proxy.json)
 
----
+## Data
 
-## Build DSL output
+Runtime data is centralized under `data/`:
 
-Generate protocol code from DSL:
+- `data/def` for packet definitions
+- `data/json` for expected/promoted decoded payloads
+- `data/debug` for promoted raw/debug packet dumps
+- `data/captures` for live captures and focus captures
 
-    cd DSL
-    python build.py
-    cd ..
+## Logs
 
----
+Current log files live under `logs/`:
 
-## Environment
+- `authserver.log`
+- `worldserver.log`
+- `proxy.log`
+- `dsl.log`
 
-Load environment variables:
-
-    source .env
-
-Example `.env`:
-
-    PYTHONPATH=./DSL/output:./proxy:./server:./common
-
-    SERVER_CONFIG=./server/config.yaml
-    AUTH_CONFIG=./server/auth_config.yaml
-    PROXY_CONFIG=./proxy/config.yaml
-
-Verify imports:
-
-    python -c "import server, proxy, common; print('OK')"
-
----
+Service logs are reset on startup so they reflect the current session.
 
 ## Run
 
-Start proxy:
+From project root:
 
-    ./proxyserver.py
+```bash
+python authserver.py
+python worldserver.py
+python proxyserver.py
+```
 
-Start world server:
+## Component Notes
 
-    ./worldserver.py
+- `authserver` and `worldserver` use the shared DSL runtime for decode/encode
+- packet output for auth/world is controlled by their own YAML files
+- the proxy is read-only and forwards original bytes unchanged
+- the proxy can still parse opcodes, decode payloads, dump captures and provide telnet control
 
-Start auth server (optional):
+## See Also
 
-    ./authserver.py
-
----
-
-## Notes
-
-- BinaryPacketsDSL generates protocol code into `output/`
-- Only `output/` is required at runtime
-- Each component manages its own configuration
-- `.env` wires everything together
-
----
-
-## Philosophy
-
-- DSL = protocol engine  
-- proxy = network tool  
-- server = game logic  
-- common = shared infrastructure  
-- template = launcher
+- [/home/magnus/projects/PyPandariaEmu/server/README.md](/home/magnus/projects/PyPandariaEmu/server/README.md)
+- [/home/magnus/projects/PyPandariaEmu/proxy/README.md](/home/magnus/projects/PyPandariaEmu/proxy/README.md)

@@ -1,0 +1,13 @@
+worldserver:
+  host: 0.0.0.0
+  port: 8086
+  logging:
+    write_to_log: true
+    log_file: worldserver.log
+  output:
+    raw: false
+    decode: true
+    dsl_warnings: true
+    blacklist: []
+
+dbc_path: "/home/magnus/docker/SkyFire_548_docker/app/data/dbc"

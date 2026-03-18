@@ -1,0 +1,8 @@
+client:
+  build: 18414
+  platform: "x86"
+  os: "Win"
+  country: "enGB"
+  timezone: 60
+  ip: "192.168.11.30"
+  addons_path: "/home/magnus/Games/World of Warcraft 5.4.8 MoP/Interface/AddOns"
