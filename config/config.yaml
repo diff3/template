@@ -12,9 +12,13 @@ worldserver:
   host: 0.0.0.0
   port: 8086
 
-program: wow
-expansion: mop
-version: v18414
+paths:
+  def_dir: ./data/def
+  capture_dir: ./data/captures
+
+# program: wow
+# expansion: mop
+# version: v18414
 
 control_server:
   enabled: true

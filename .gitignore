@@ -4,6 +4,8 @@ proxy/
 server/
 shared
 logs/
+data/
+.vscode
 
 # Python
 __pycache__/
@@ -16,3 +18,4 @@ __pycache__/
 # OS junk
 .DS_Store
 Thumbs.db
+docs
