@@ -4,6 +4,16 @@
     "write_to_log": true,
     "log_file": "proxy.log",
     "listen_host": "0.0.0.0",
+    "telnet": {
+      "host": "127.0.0.1",
+      "port": 1337,
+      "auth": {
+        "enabled": false,
+        "username": "admin",
+        "password": "changeme",
+        "max_attempts": 3
+      }
+    },
     "proxy": {
       "adapters": {
         "opcode_parser": true,
@@ -36,25 +46,62 @@
   },
   "states": {
     "default": {
-      "enable_log": true,
-      "enable_view": true,
-      "enable_decode": true,
       "routes": {
         "auth": {
           "listen": 3724,
           "forward": {
             "host": "127.0.0.1",
             "port": 3720
-          }
+          },
+          "name": "auth",
+          "phase": "auth"
         },
         "world": {
           "listen": 8085,
           "forward": {
             "host": "127.0.0.1",
             "port": 8086
-          }
+          },
+          "name": "world",
+          "phase": "world"
         }
-      }
+      },
+      "proxy": {
+        "adapters": {
+          "opcode_parser": true,
+          "decode": true,
+          "logging": true
+        },
+        "logging": {
+          "mode": "opcode",
+          "raw_format": "hex",
+          "show_opcode": true,
+          "show_decoded": true,
+          "show_raw": false,
+          "show_raw_if_undecoded": true,
+          "max_raw_bytes": 256
+        },
+        "filter": {
+          "whitelist": [],
+          "blacklist": [
+            "SMSG_ON_MONSTER_MOVE",
+            "SMSG_SPLINE_MOVE_UNSET_FLYING"
+          ]
+        },
+        "capture": {
+          "dump": false,
+          "focus": [],
+          "profile": ""
+        },
+        "phases": {
+          "auth": {},
+          "world": {}
+        },
+        "routes": {}
+      },
+      "enable_log": true,
+      "enable_view": true,
+      "enable_decode": false
     },
     "skyfire": {
       "routes": {
