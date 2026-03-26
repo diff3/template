@@ -39,7 +39,9 @@
       },
       "phases": {
         "auth": {},
-        "world": {}
+        "world": {
+          "mode": "srp6"
+        }
       },
       "routes": {}
     }
@@ -50,7 +52,7 @@
         "auth": {
           "listen": 3724,
           "forward": {
-            "host": "127.0.0.1",
+            "host": "192.168.11.30",
             "port": 3720
           },
           "name": "auth",
@@ -59,7 +61,7 @@
         "world": {
           "listen": 8085,
           "forward": {
-            "host": "127.0.0.1",
+            "host": "192.168.11.30",
             "port": 8086
           },
           "name": "world",
@@ -95,7 +97,9 @@
         },
         "phases": {
           "auth": {},
-          "world": {}
+          "world": {
+            "mode": "srp6"
+          }
         },
         "routes": {}
       },
@@ -106,17 +110,122 @@
     "skyfire": {
       "routes": {
         "auth": {
+          "listen": 3724,
           "forward": {
-            "host": "192.168.11.30"
-          }
+            "host": "192.168.11.30",
+            "port": 3720
+          },
+          "name": "auth",
+          "phase": "auth"
         },
         "world": {
+          "listen": 8085,
           "forward": {
             "host": "192.168.11.30",
             "port": 8086
-          }
+          },
+          "name": "world",
+          "phase": "world"
         }
-      }
+      },
+      "proxy": {
+        "adapters": {
+          "opcode_parser": true,
+          "decode": true,
+          "logging": true
+        },
+        "logging": {
+          "mode": "opcode",
+          "raw_format": "hex",
+          "show_opcode": true,
+          "show_decoded": true,
+          "show_raw": false,
+          "show_raw_if_undecoded": true,
+          "max_raw_bytes": 256
+        },
+        "filter": {
+          "whitelist": [],
+          "blacklist": [
+            "SMSG_ON_MONSTER_MOVE",
+            "SMSG_SPLINE_MOVE_UNSET_FLYING"
+          ]
+        },
+        "capture": {
+          "dump": false,
+          "focus": [],
+          "profile": ""
+        },
+        "phases": {
+          "auth": {},
+          "world": {
+            "mode": "srp6"
+          }
+        },
+        "routes": {}
+      },
+      "enable_log": true,
+      "enable_view": true,
+      "enable_decode": false
+    },
+    "pandaria": {
+      "routes": {
+        "auth": {
+          "listen": 3724,
+          "forward": {
+            "host": "192.168.11.30",
+            "port": 3734
+          },
+          "name": "auth",
+          "phase": "auth"
+        },
+        "world": {
+          "listen": 8085,
+          "forward": {
+            "host": "192.168.11.30",
+            "port": 8035
+          },
+          "name": "world",
+          "phase": "world"
+        }
+      },
+      "proxy": {
+        "adapters": {
+          "opcode_parser": true,
+          "decode": true,
+          "logging": true
+        },
+        "logging": {
+          "mode": "opcode",
+          "raw_format": "hex",
+          "show_opcode": true,
+          "show_decoded": false,
+          "show_raw": false,
+          "show_raw_if_undecoded": true,
+          "max_raw_bytes": 256
+        },
+        "filter": {
+          "whitelist": [],
+          "blacklist": [
+            "SMSG_ON_MONSTER_MOVE",
+            "SMSG_SPLINE_MOVE_UNSET_FLYING"
+          ]
+        },
+        "capture": {
+          "dump": false,
+          "focus": [],
+          "profile": ""
+        },
+        "phases": {
+          "auth": {},
+          "world": {
+            "mode": "legacy"
+          }
+        },
+        "routes": {}
+      },
+      "enable_log": true,
+      "enable_view": true,
+      "enable_decode": false
     }
   }
 }

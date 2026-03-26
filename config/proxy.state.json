@@ -1,0 +1,62 @@
+{
+  "active_state": "skyfire",
+  "enable_decode": false,
+  "enable_log": true,
+  "enable_view": true,
+  "proxy": {
+    "adapters": {
+      "decode": true,
+      "logging": true,
+      "opcode_parser": true
+    },
+    "capture": {
+      "dump": false,
+      "focus": [],
+      "profile": ""
+    },
+    "filter": {
+      "blacklist": [
+        "SMSG_ON_MONSTER_MOVE",
+        "SMSG_SPLINE_MOVE_UNSET_FLYING"
+      ],
+      "whitelist": []
+    },
+    "logging": {
+      "max_raw_bytes": 256,
+      "mode": "opcode",
+      "raw_format": "hex",
+      "show_decoded": true,
+      "show_opcode": true,
+      "show_raw": false,
+      "show_raw_if_undecoded": true
+    },
+    "phases": {
+      "auth": {},
+      "world": {
+        "mode": "srp6"
+      }
+    },
+    "routes": {}
+  },
+  "routes": {
+    "auth": {
+      "forward": {
+        "host": "192.168.11.30",
+        "port": 3720
+      },
+      "listen": 3724,
+      "name": "auth",
+      "phase": "auth"
+    },
+    "world": {
+      "forward": {
+        "host": "192.168.11.30",
+        "port": 8086
+      },
+      "listen": 8085,
+      "name": "world",
+      "phase": "world"
+    }
+  },
+  "schema_version": 1
+}
