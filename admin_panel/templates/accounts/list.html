@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Accounts{% endblock %}
+{% block content %}
+<section class="card">
+    <div class="section-head">
+        <h1>Accounts</h1>
+        <a class="button-link" href="{{ url_for('account_create') }}">Create account</a>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Expansion</th>
+                <th>Locked</th>
+                <th>Last IP</th>
+                <th>OS</th>
+                <th>GM</th>
+                <th>Access</th>
+                <th>Ban</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for account in accounts %}
+            <tr>
+                <td>{{ account.id }}</td>
+                <td>{{ account.username }}</td>
+                <td>{{ account.email }}</td>
+                <td>{{ account.expansion }}</td>
+                <td>{{ account.locked }}</td>
+                <td>{{ account.last_ip }}</td>
+                <td>{{ account.os }}</td>
+                <td>{{ account.gmlevel }}</td>
+                <td>{{ account.access_rows or "" }}</td>
+                <td>
+                    {% if account.banned_active %}
+                        active: {{ account.banreason or "" }}
+                    {% endif %}
+                </td>
+                <td class="actions">
+                    <a href="{{ url_for('account_edit', account_id=account.id) }}">Edit</a>
+                    <form action="{{ url_for('account_delete', account_id=account.id) }}" method="post" onsubmit="return confirm('Delete account {{ account.username }}?');">
+                        <button type="submit" class="danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

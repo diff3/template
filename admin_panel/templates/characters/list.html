@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Characters{% endblock %}
+{% block content %}
+<section class="card">
+    <div class="section-head">
+        <h1>Characters</h1>
+        <span class="muted">Showing latest 500 rows</span>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Guid</th>
+                <th>Realm</th>
+                <th>Account</th>
+                <th>Name</th>
+                <th>Race</th>
+                <th>Class</th>
+                <th>Level</th>
+                <th>Money</th>
+                <th>Map</th>
+                <th>Pos</th>
+                <th>Health</th>
+                <th>Power</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for character in characters %}
+            <tr>
+                <td>{{ character.guid }}</td>
+                <td>{{ character.realm }}</td>
+                <td>{{ character.account }}</td>
+                <td>{{ character.name }}</td>
+                <td>{{ character.race }}</td>
+                <td>{{ character.class_id }}</td>
+                <td>{{ character.level }}</td>
+                <td>{{ character.money }}</td>
+                <td>{{ character.map }}</td>
+                <td>{{ character.position_x }}, {{ character.position_y }}, {{ character.position_z }}</td>
+                <td>{{ character.health }}</td>
+                <td>{{ character.power1 }}</td>
+                <td class="actions">
+                    <a href="{{ url_for('character_edit', guid=character.guid) }}">Edit</a>
+                    <form action="{{ url_for('character_delete', guid=character.guid) }}" method="post" onsubmit="return confirm('Delete character {{ character.name }}?');">
+                        <button type="submit" class="danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

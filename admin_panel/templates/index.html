@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>Dashboard</h1>
+    <div class="stats">
+        <div class="stat">
+            <span class="stat-label">Accounts</span>
+            <strong>{{ counts.accounts }}</strong>
+        </div>
+        <div class="stat">
+            <span class="stat-label">Characters</span>
+            <strong>{{ counts.characters }}</strong>
+        </div>
+        <div class="stat">
+            <span class="stat-label">Realms</span>
+            <strong>{{ counts.realms }}</strong>
+        </div>
+    </div>
+</section>
+{% endblock %}

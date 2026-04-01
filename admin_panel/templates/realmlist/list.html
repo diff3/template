@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Realmlist{% endblock %}
+{% block content %}
+<section class="card">
+    <div class="section-head">
+        <h1>Realmlist</h1>
+        <a class="button-link" href="{{ url_for('realm_create') }}">Create realm</a>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Port</th>
+                <th>Icon</th>
+                <th>Flag</th>
+                <th>Timezone</th>
+                <th>AllowedSecurityLevel</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for realm in realms %}
+            <tr>
+                <td>{{ realm.id }}</td>
+                <td>{{ realm.name }}</td>
+                <td>{{ realm.address }}</td>
+                <td>{{ realm.port }}</td>
+                <td>{{ realm.icon }}</td>
+                <td>{{ realm.flag }}</td>
+                <td>{{ realm.timezone }}</td>
+                <td>{{ realm.allowedSecurityLevel }}</td>
+                <td class="actions">
+                    <a href="{{ url_for('realm_edit', realm_id=realm.id) }}">Edit</a>
+                    <form action="{{ url_for('realm_delete', realm_id=realm.id) }}" method="post" onsubmit="return confirm('Delete realm {{ realm.name }}?');">
+                        <button type="submit" class="danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Edit Character{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>Edit Character #{{ character.guid }}</h1>
+    <form method="post" class="form-grid">
+        <label>
+            GUID
+            <input type="text" value="{{ character.guid }}" readonly>
+        </label>
+        <label>
+            Realm
+            <input type="text" value="{{ character.realm }}" readonly>
+        </label>
+        <label>
+            Account
+            <input type="number" name="account" value="{{ character.account }}" required>
+        </label>
+        <label>
+            Name
+            <input type="text" name="name" value="{{ character.name }}" required>
+        </label>
+        <label>
+            Race
+            <input type="number" name="race" value="{{ character.race }}" required>
+        </label>
+        <label>
+            Class
+            <input type="number" name="class_id" value="{{ character.class_id }}" required>
+        </label>
+        <label>
+            Level
+            <input type="number" name="level" value="{{ character.level }}" required>
+        </label>
+        <label>
+            Money
+            <input type="number" name="money" value="{{ character.money }}" required>
+        </label>
+        <label>
+            Map
+            <input type="number" name="map" value="{{ character.map }}" required>
+        </label>
+        <label>
+            X
+            <input type="text" name="position_x" value="{{ character.position_x }}" required>
+        </label>
+        <label>
+            Y
+            <input type="text" name="position_y" value="{{ character.position_y }}" required>
+        </label>
+        <label>
+            Z
+            <input type="text" name="position_z" value="{{ character.position_z }}" required>
+        </label>
+        <label>
+            Health
+            <input type="number" name="health" value="{{ character.health }}" required>
+        </label>
+        <label>
+            Power
+            <input type="number" name="power1" value="{{ character.power1 }}" required>
+        </label>
+        <div class="form-actions">
+            <button type="submit">Save</button>
+            <a class="button-link secondary" href="{{ url_for('characters') }}">Back</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

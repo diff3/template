@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}{% if account %}Edit Account{% else %}Create Account{% endif %}{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>{% if account %}Edit Account #{{ account.id }}{% else %}Create Account{% endif %}</h1>
+    <form method="post" class="form-grid">
+        {% if account %}
+        <label>
+            ID
+            <input type="text" value="{{ account.id }}" readonly>
+        </label>
+        {% endif %}
+        <label>
+            Username
+            <input type="text" name="username" value="{{ account.username if account else '' }}" required>
+        </label>
+        <label>
+            Password {% if account %}<span class="muted">(leave empty to keep current)</span>{% endif %}
+            <input type="password" name="password" {% if not account %}required{% endif %}>
+        </label>
+        <label>
+            Email
+            <input type="email" name="email" value="{{ account.email if account else '' }}">
+        </label>
+        <label>
+            Expansion
+            <input type="number" name="expansion" value="{{ account.expansion if account else 5 }}">
+        </label>
+        <label class="checkbox">
+            <input type="checkbox" name="locked" {% if account and account.locked %}checked{% endif %}>
+            Locked
+        </label>
+        <label>
+            Last IP
+            <input type="text" name="last_ip" value="{{ account.last_ip if account else '0.0.0.0' }}">
+        </label>
+        <label>
+            OS
+            <input type="text" name="os" value="{{ account.os if account else 'Win' }}">
+        </label>
+        {% if not account %}
+        <label>
+            Initial GM Level
+            <input type="number" name="gmlevel" value="3">
+        </label>
+        <label>
+            Initial RealmID
+            <input type="number" name="realmID" value="-1">
+        </label>
+        {% endif %}
+        <div class="form-actions">
+            <button type="submit">Save</button>
+            <a class="button-link secondary" href="{{ url_for('accounts') }}">Back</a>
+        </div>
+    </form>
+</section>
+
+{% if account %}
+<section class="card">
+    <h2>Account Access</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>RealmID</th>
+                <th>GM Level</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in access_rows %}
+            <tr>
+                <td>{{ row.RealmID }}</td>
+                <td>{{ row.gmlevel }}</td>
+                <td class="actions">
+                    <form action="{{ url_for('account_access_delete', account_id=account.id, realm_id=row.RealmID) }}" method="post">
+                        <button type="submit" class="danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form method="post" action="{{ url_for('account_access_save', account_id=account.id) }}" class="inline-form">
+        <label>
+            RealmID
+            <input type="number" name="realmID" value="-1" required>
+        </label>
+        <label>
+            GM Level
+            <input type="number" name="gmlevel" value="3" required>
+        </label>
+        <button type="submit">Add or update access</button>
+    </form>
+</section>
+
+<section class="card">
+    <h2>Account Bans</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Bandate</th>
+                <th>Unbandate</th>
+                <th>Reason</th>
+                <th>Active</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ban in bans %}
+            <tr>
+                <td>{{ ban.bandate }}</td>
+                <td>{{ ban.unbandate }}</td>
+                <td>{{ ban.banreason }}</td>
+                <td>{{ ban.active }}</td>
+                <td class="actions">
+                    <form action="{{ url_for('account_ban_delete', account_id=account.id, bandate=ban.bandate) }}" method="post">
+                        <button type="submit" class="danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form method="post" action="{{ url_for('account_ban_create', account_id=account.id) }}" class="form-grid">
+        <label>
+            Bandate (unix time)
+            <input type="number" name="bandate" required>
+        </label>
+        <label>
+            Unbandate (unix time)
+            <input type="number" name="unbandate" value="0">
+        </label>
+        <label>
+            Banned By
+            <input type="text" name="bannedby" value="{{ session.username }}">
+        </label>
+        <label>
+            Reason
+            <input type="text" name="banreason" value="">
+        </label>
+        <label class="checkbox">
+            <input type="checkbox" name="active" checked>
+            Active
+        </label>
+        <div class="form-actions">
+            <button type="submit">Add ban</button>
+        </div>
+    </form>
+</section>
+{% endif %}
+{% endblock %}
