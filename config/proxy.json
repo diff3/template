@@ -1,9 +1,27 @@
 {
   "shared": {
     "buffer_size": 4096,
-    "write_to_log": true,
-    "log_file": "proxy.log",
     "listen_host": "0.0.0.0",
+    "paths": {
+      "root": ".",
+      "def_dir": "data/def",
+      "capture_dir": "data/captures",
+      "logs": "logs"
+    },
+    "logging": {
+      "write_to_log": true,
+      "log_file": "proxy.log",
+      "logging_levels": "All",
+      "logging_file_levels": "All",
+      "show_scope": false,
+      "date_format": " [%Y-%m-%d %H:%M:%S]"
+    },
+    "database": {
+      "host": "192.168.11.81",
+      "port": 3306,
+      "username": "root",
+      "password": "pwd"
+    },
     "telnet": {
       "host": "127.0.0.1",
       "port": 1337,
@@ -48,52 +66,99 @@
   },
   "states": {
     "default": {
+      "database": {
+        "auth_db": "skyfire548_auth",
+        "world_db": "skyfire548_world",
+        "characters_db": "skyfire548_characters"
+      },
       "routes": {
         "auth": {
-          "listen": 3724,
           "forward": {
             "host": "192.168.11.30",
             "port": 3720
           },
+          "listen": 3724,
           "name": "auth",
           "phase": "auth"
         },
         "world": {
-          "listen": 8085,
           "forward": {
             "host": "192.168.11.30",
             "port": 8086
           },
+          "listen": 8085,
           "name": "world",
           "phase": "world"
         }
       },
       "proxy": {
         "adapters": {
-          "opcode_parser": true,
           "decode": true,
-          "logging": true
-        },
-        "logging": {
-          "mode": "opcode",
-          "raw_format": "hex",
-          "show_opcode": true,
-          "show_decoded": true,
-          "show_raw": false,
-          "show_raw_if_undecoded": true,
-          "max_raw_bytes": 256
-        },
-        "filter": {
-          "whitelist": [],
-          "blacklist": [
-            "SMSG_ON_MONSTER_MOVE",
-            "SMSG_SPLINE_MOVE_UNSET_FLYING"
-          ]
+          "logging": true,
+          "opcode_parser": true
         },
         "capture": {
           "dump": false,
-          "focus": [],
+          "focus": [
+            "ON",
+            "CMSG_MESSAGECHAT_SAY",
+            "SMSG_MESSAGECHAT",
+            "CMSG_WHO",
+            "SMSG_WHO",
+            "CMSG_CAST_SPELL",
+            "SMSG_SPELL_START",
+            "SMSG_SPELL_GO",
+            "SMSG_AURA_UPDATE",
+            "CMSG_CANCEL_AURA",
+            "CMSG_CANCEL_MOUNT_AURA",
+            "SMSG_UPDATE_OBJECT",
+            "SMSG_MOVE_SET_RUN_SPEED",
+            "SMSG_MOVE_SET_WALK_SPEED",
+            "SMSG_MOVE_SET_SWIM_SPEED",
+            "SMSG_MOVE_SET_FLIGHT_SPEED",
+            "CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK",
+            "SMSG_PLAYER_MOVE",
+            "MSG_MOVE_START_FORWARD",
+            "MSG_MOVE_STOP",
+            "MSG_MOVE_HEARTBEAT",
+            "MSG_MOVE_START_TURN_LEFT",
+            "MSG_MOVE_START_TURN_RIGHT",
+            "MSG_MOVE_STOP_TURN",
+            "MSG_MOVE_START_BACKWARD",
+            "MSG_MOVE_START_STRAFE_LEFT",
+            "MSG_MOVE_START_STRAFE_RIGHT",
+            "MSG_MOVE_STOP_STRAFE",
+            "MSG_MOVE_SET_FACING",
+            "MSG_MOVE_JUMP",
+            "MSG_MOVE_FALL_LAND",
+            "SMSG_MOVE_TELEPORT",
+            "CMSG_MOVE_TELEPORT_ACK",
+            "SMSG_TRANSFER_PENDING",
+            "SMSG_NEW_WORLD",
+            "MSG_MOVE_WORLDPORT_ACK",
+            "SMSG_MOVE_UPDATE_RUN_SPEED",
+            "SMSG_MOVE_UPDATE_WALK_SPEED",
+            "SMSG_MOVE_UPDATE_TURN_RATE",
+            "SMSG_MOVE_SET_TURN_RATE",
+            "SMSG_MOVE_UPDATE_TELEPORT"
+          ],
           "profile": ""
+        },
+        "filter": {
+          "blacklist": [
+            "SMSG_ON_MONSTER_MOVE",
+            "SMSG_SPLINE_MOVE_UNSET_FLYING"
+          ],
+          "whitelist": []
+        },
+        "logging": {
+          "max_raw_bytes": 256,
+          "mode": "opcode",
+          "raw_format": "hex",
+          "show_decoded": true,
+          "show_opcode": true,
+          "show_raw": false,
+          "show_raw_if_undecoded": true
         },
         "phases": {
           "auth": {},
@@ -108,27 +173,54 @@
       "enable_decode": false
     },
     "skyfire": {
-      "routes": {
-        "auth": {
-          "listen": 3724,
-          "forward": {
-            "host": "192.168.11.30",
-            "port": 3720
-          },
-          "name": "auth",
-          "phase": "auth"
-        },
-        "world": {
-          "listen": 8085,
-          "forward": {
-            "host": "192.168.11.30",
-            "port": 8086
-          },
-          "name": "world",
-          "phase": "world"
-        }
-      },
       "proxy": {
+        "capture": {
+          "profile": "skyfire548",
+          "dump": true,
+          "focus": [
+            "ON",
+            "CMSG_MESSAGECHAT_SAY",
+            "SMSG_MESSAGECHAT",
+            "CMSG_WHO",
+            "SMSG_WHO",
+            "CMSG_CAST_SPELL",
+            "SMSG_SPELL_START",
+            "SMSG_SPELL_GO",
+            "SMSG_AURA_UPDATE",
+            "CMSG_CANCEL_AURA",
+            "CMSG_CANCEL_MOUNT_AURA",
+            "SMSG_UPDATE_OBJECT",
+            "SMSG_MOVE_SET_RUN_SPEED",
+            "SMSG_MOVE_SET_WALK_SPEED",
+            "SMSG_MOVE_SET_SWIM_SPEED",
+            "SMSG_MOVE_SET_FLIGHT_SPEED",
+            "CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK",
+            "SMSG_PLAYER_MOVE",
+            "MSG_MOVE_START_FORWARD",
+            "MSG_MOVE_STOP",
+            "MSG_MOVE_HEARTBEAT",
+            "MSG_MOVE_START_TURN_LEFT",
+            "MSG_MOVE_START_TURN_RIGHT",
+            "MSG_MOVE_STOP_TURN",
+            "MSG_MOVE_START_BACKWARD",
+            "MSG_MOVE_START_STRAFE_LEFT",
+            "MSG_MOVE_START_STRAFE_RIGHT",
+            "MSG_MOVE_STOP_STRAFE",
+            "MSG_MOVE_SET_FACING",
+            "MSG_MOVE_JUMP",
+            "MSG_MOVE_FALL_LAND",
+            "SMSG_MOVE_TELEPORT",
+            "CMSG_MOVE_TELEPORT_ACK",
+            "SMSG_TRANSFER_PENDING",
+            "SMSG_NEW_WORLD",
+            "MSG_MOVE_WORLDPORT_ACK",
+            "SMSG_MOVE_UPDATE_RUN_SPEED",
+            "SMSG_MOVE_UPDATE_WALK_SPEED",
+            "SMSG_MOVE_UPDATE_TURN_RATE",
+            "SMSG_MOVE_SET_TURN_RATE",
+            "SMSG_MOVE_UPDATE_TELEPORT"
+          ]
+        },
         "adapters": {
           "opcode_parser": true,
           "decode": true,
@@ -150,11 +242,6 @@
             "SMSG_SPLINE_MOVE_UNSET_FLYING"
           ]
         },
-        "capture": {
-          "dump": false,
-          "focus": [],
-          "profile": ""
-        },
         "phases": {
           "auth": {},
           "world": {
@@ -163,11 +250,36 @@
         },
         "routes": {}
       },
+      "routes": {
+        "auth": {
+          "forward": {
+            "host": "192.168.11.30",
+            "port": 3794
+          },
+          "listen": 3724,
+          "name": "auth",
+          "phase": "auth"
+        },
+        "world": {
+          "forward": {
+            "host": "192.168.11.30",
+            "port": 8095
+          },
+          "listen": 8085,
+          "name": "world",
+          "phase": "world"
+        }
+      },
       "enable_log": true,
       "enable_view": true,
       "enable_decode": false
     },
     "pandaria": {
+      "database": {
+        "auth_db": "pandaria548_auth",
+        "world_db": "pandaria548_world",
+        "characters_db": "pandaria548_characters"
+      },
       "routes": {
         "auth": {
           "listen": 3724,
@@ -189,19 +301,76 @@
         }
       },
       "proxy": {
+        "logging": {
+          "mode": "opcode",
+          "raw_format": "bytes",
+          "show_opcode": true,
+          "show_decoded": true,
+          "show_raw": true,
+          "show_raw_if_undecoded": true,
+          "max_raw_bytes": 256
+        },
+        "capture": {
+          "dump": true,
+          "focus": [
+            "CMSG_MESSAGECHAT_SAY",
+            "SMSG_MESSAGECHAT",
+            "CMSG_WHO",
+            "SMSG_WHO",
+            "CMSG_CAST_SPELL",
+            "SMSG_SPELL_START",
+            "SMSG_SPELL_GO",
+            "SMSG_AURA_UPDATE",
+            "SMSG_AURA_UPDATE_ALL",
+            "SMSG_AURA_UPDATE_SINGLE",
+            "CMSG_CANCEL_AURA",
+            "CMSG_CANCEL_MOUNT_AURA",
+            "SMSG_UPDATE_OBJECT",
+            "SMSG_MOVE_SET_RUN_SPEED",
+            "SMSG_MOVE_SET_WALK_SPEED",
+            "SMSG_MOVE_SET_SWIM_SPEED",
+            "SMSG_MOVE_SET_FLIGHT_SPEED",
+            "CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK",
+            "SMSG_PLAYER_MOVE",
+            "MSG_MOVE_START_FORWARD",
+            "MSG_MOVE_STOP",
+            "MSG_MOVE_HEARTBEAT",
+            "MSG_MOVE_START_TURN_LEFT",
+            "MSG_MOVE_START_TURN_RIGHT",
+            "MSG_MOVE_STOP_TURN",
+            "MSG_MOVE_START_BACKWARD",
+            "MSG_MOVE_START_STRAFE_LEFT",
+            "MSG_MOVE_START_STRAFE_RIGHT",
+            "MSG_MOVE_STOP_STRAFE",
+            "MSG_MOVE_SET_FACING",
+            "MSG_MOVE_JUMP",
+            "MSG_MOVE_FALL_LAND",
+            "SMSG_MOVE_TELEPORT",
+            "CMSG_MOVE_TELEPORT_ACK",
+            "SMSG_TRANSFER_PENDING",
+            "SMSG_NEW_WORLD",
+            "MSG_MOVE_WORLDPORT_ACK",
+            "SMSG_MOVE_UPDATE_RUN_SPEED",
+            "SMSG_MOVE_UPDATE_WALK_SPEED",
+            "SMSG_MOVE_UPDATE_TURN_RATE",
+            "SMSG_MOVE_SET_TURN_RATE",
+            "SMSG_MOVE_UPDATE_TELEPORT",
+            "SMSG_SET_VEHICLE_REC_ID",
+            "SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA",
+            "ON"
+          ],
+          "profile": "pandaria548"
+        },
+        "phases": {
+          "auth": {},
+          "world": {
+            "mode": "legacy"
+          }
+        },
         "adapters": {
           "opcode_parser": true,
           "decode": true,
           "logging": true
-        },
-        "logging": {
-          "mode": "opcode",
-          "raw_format": "hex",
-          "show_opcode": true,
-          "show_decoded": false,
-          "show_raw": false,
-          "show_raw_if_undecoded": true,
-          "max_raw_bytes": 256
         },
         "filter": {
           "whitelist": [],
@@ -210,22 +379,11 @@
             "SMSG_SPLINE_MOVE_UNSET_FLYING"
           ]
         },
-        "capture": {
-          "dump": false,
-          "focus": [],
-          "profile": ""
-        },
-        "phases": {
-          "auth": {},
-          "world": {
-            "mode": "legacy"
-          }
-        },
         "routes": {}
       },
       "enable_log": true,
       "enable_view": true,
-      "enable_decode": false
+      "enable_decode": true
     }
   }
 }
