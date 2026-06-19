@@ -6,8 +6,29 @@ worldserver:
     log_file: worldserver.log
   output:
     raw: false
-    decode: true
+    decode: false
     dsl_warnings: true
     blacklist: []
 
-dbc_path: "/home/magnus/docker/SkyFire_548_docker/app/data/dbc"
+dbc_path: "data/client/dbc"
+db2_path: "data/client/db2"
+maps_path: "data/client/maps"
+
+Transport:
+  EnableElevators: true
+  EnableMovingTransports: true
+  DebugMovement: false
+
+Taxi:
+  EnableFlightPaths: true
+  DebugMovement: false
+
+Player:
+  EnableMapExploreCheat: false
+  EnableTaxiCheat: false
+
+World:
+  EnableGameObjects: true
+  DebugGameObjectOrientation: false
+  EnableNPCs: true
+  EnableNPCAutoStream: true

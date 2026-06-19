@@ -2,150 +2,122 @@
 {% block title %}{% if account %}Edit Account{% else %}Create Account{% endif %}{% endblock %}
 {% block content %}
 <section class="card">
-    <h1>{% if account %}Edit Account #{{ account.id }}{% else %}Create Account{% endif %}</h1>
+    <h1>{% if account %}Edit Account #{{ account.id }}: {{ account.username }}{% else %}Create Account{% endif %}</h1>
     <form method="post" class="form-grid">
         {% if account %}
         <label>
             ID
             <input type="text" value="{{ account.id }}" readonly>
         </label>
-        {% endif %}
         <label>
             Username
-            <input type="text" name="username" value="{{ account.username if account else '' }}" required>
+            <input type="text" name="username" value="{{ account.username }}" required>
         </label>
+        {% else %}
         <label>
-            Password {% if account %}<span class="muted">(leave empty to keep current)</span>{% endif %}
-            <input type="password" name="password" {% if not account %}required{% endif %}>
+            Username
+            <input type="text" name="username" value="" required>
         </label>
+        {% endif %}
         <label>
             Email
             <input type="email" name="email" value="{{ account.email if account else '' }}">
         </label>
         <label>
             Expansion
-            <input type="number" name="expansion" value="{{ account.expansion if account else 5 }}">
-        </label>
-        <label class="checkbox">
-            <input type="checkbox" name="locked" {% if account and account.locked %}checked{% endif %}>
-            Locked
-        </label>
-        <label>
-            Last IP
-            <input type="text" name="last_ip" value="{{ account.last_ip if account else '0.0.0.0' }}">
+            {% set current_expansion = (account.expansion if account else 5)|int %}
+            <select name="expansion">
+                {% for value, label in expansions.items() %}
+                <option value="{{ value }}" {% if (current_expansion == value) or (current_expansion > 4 and value == 4) %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
         </label>
         <label>
-            OS
-            <input type="text" name="os" value="{{ account.os if account else 'Win' }}">
+            GM Level
+            <select name="gmlevel">
+                {% for value, label in gm_levels.items() %}
+                <option value="{{ value }}" {% if gmlevel|int == value %}selected{% endif %}>{{ value }} - {{ label }}</option>
+                {% endfor %}
+            </select>
         </label>
-        {% if not account %}
         <label>
-            Initial GM Level
-            <input type="number" name="gmlevel" value="3">
+            Password
+            <input type="password" name="password" {% if not account %}required{% endif %}>
+            {% if account %}<span class="field-note">Leave empty to keep current.</span>{% endif %}
         </label>
-        <label>
-            Initial RealmID
-            <input type="number" name="realmID" value="-1">
+        <label class="check-field">
+            <span>Banned</span>
+            <span class="check-row">
+            <input type="checkbox" name="banned" {% if banned %}checked{% endif %}>
+            <span>Yes</span>
+            </span>
         </label>
-        {% endif %}
         <div class="form-actions">
             <button type="submit">Save</button>
             <a class="button-link secondary" href="{{ url_for('accounts') }}">Back</a>
         </div>
     </form>
 </section>
-
 {% if account %}
 <section class="card">
-    <h2>Account Access</h2>
-    <table>
+    <div class="section-head">
+        <h2>Characters</h2>
+        <span class="muted">{{ characters|length }} total</span>
+    </div>
+    <table class="account-characters-table">
         <thead>
             <tr>
-                <th>RealmID</th>
-                <th>GM Level</th>
-                <th></th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Level</th>
+                <th>Race</th>
+                <th>Class</th>
+                <th>Map</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            {% for row in access_rows %}
-            <tr>
-                <td>{{ row.RealmID }}</td>
-                <td>{{ row.gmlevel }}</td>
+            {% for character in characters %}
+            <tr class="{% if character.online %}online-row{% endif %}">
+                <td>{{ character.guid }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('character_rename', account_id=account.id, guid=character.guid) }}" class="inline-form compact-form">
+                        {% if character.faction_icon %}
+                        <img class="faction-icon" src="{{ url_for('static', filename=character.faction_icon) }}" alt="" title="{{ character.faction|capitalize }}">
+                        {% else %}
+                        <span class="faction-dot faction-{{ character.faction }}" title="{{ character.faction|capitalize }}"></span>
+                        {% endif %}
+                        <input type="text" name="name" value="{{ character.name }}" required maxlength="12">
+                        <button type="submit">Rename</button>
+                    </form>
+                </td>
+                <td>{{ character.level }}</td>
+                <td title="Race {{ character.race }}">
+                    <span class="icon-label">
+                        {% if character.race_icon %}<img class="character-icon" src="{{ url_for('static', filename=character.race_icon) }}" alt="" title="{{ character.race_name }}">{% endif %}
+                        {{ character.race_name }}
+                    </span>
+                </td>
+                <td title="Class {{ character.class_id }}">
+                    <span class="icon-label">
+                        {% if character.class_icon %}<img class="character-icon" src="{{ url_for('static', filename=character.class_icon) }}" alt="" title="{{ character.class_name }}">{% endif %}
+                        {{ character.class_name }}
+                    </span>
+                </td>
+                <td title="Map {{ character.map }}{% if character.zone_name %}, Zone {{ character.zone }}{% endif %}">{{ character.location_name }}</td>
                 <td class="actions">
-                    <form action="{{ url_for('account_access_delete', account_id=account.id, realm_id=row.RealmID) }}" method="post">
+                    <form method="post" action="{{ url_for('character_delete', account_id=account.id, guid=character.guid) }}" onsubmit="return confirm('Delete character {{ character.name }}?');">
                         <button type="submit" class="danger">Delete</button>
                     </form>
                 </td>
             </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <form method="post" action="{{ url_for('account_access_save', account_id=account.id) }}" class="inline-form">
-        <label>
-            RealmID
-            <input type="number" name="realmID" value="-1" required>
-        </label>
-        <label>
-            GM Level
-            <input type="number" name="gmlevel" value="3" required>
-        </label>
-        <button type="submit">Add or update access</button>
-    </form>
-</section>
-
-<section class="card">
-    <h2>Account Bans</h2>
-    <table>
-        <thead>
+            {% else %}
             <tr>
-                <th>Bandate</th>
-                <th>Unbandate</th>
-                <th>Reason</th>
-                <th>Active</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ban in bans %}
-            <tr>
-                <td>{{ ban.bandate }}</td>
-                <td>{{ ban.unbandate }}</td>
-                <td>{{ ban.banreason }}</td>
-                <td>{{ ban.active }}</td>
-                <td class="actions">
-                    <form action="{{ url_for('account_ban_delete', account_id=account.id, bandate=ban.bandate) }}" method="post">
-                        <button type="submit" class="danger">Delete</button>
-                    </form>
-                </td>
+                <td colspan="7" class="muted">No characters found.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <form method="post" action="{{ url_for('account_ban_create', account_id=account.id) }}" class="form-grid">
-        <label>
-            Bandate (unix time)
-            <input type="number" name="bandate" required>
-        </label>
-        <label>
-            Unbandate (unix time)
-            <input type="number" name="unbandate" value="0">
-        </label>
-        <label>
-            Banned By
-            <input type="text" name="bannedby" value="{{ session.username }}">
-        </label>
-        <label>
-            Reason
-            <input type="text" name="banreason" value="">
-        </label>
-        <label class="checkbox">
-            <input type="checkbox" name="active" checked>
-            Active
-        </label>
-        <div class="form-actions">
-            <button type="submit">Add ban</button>
-        </div>
-    </form>
 </section>
 {% endif %}
 {% endblock %}

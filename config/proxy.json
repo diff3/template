@@ -5,7 +5,9 @@
     "paths": {
       "root": ".",
       "def_dir": "data/def",
-      "capture_dir": "data/captures",
+      "capture_dir": "data/proxy/captures",
+      "json_dir": "data/proxy/json",
+      "debug_dir": "data/proxy/debug",
       "logs": "logs"
     },
     "logging": {
@@ -17,8 +19,8 @@
       "date_format": " [%Y-%m-%d %H:%M:%S]"
     },
     "database": {
-      "host": "192.168.11.81",
-      "port": 3306,
+      "host": "localhost",
+      "port": 3333,
       "username": "root",
       "password": "pwd"
     },
@@ -74,7 +76,7 @@
       "routes": {
         "auth": {
           "forward": {
-            "host": "192.168.11.30",
+            "host": "127.0.0.1",
             "port": 3720
           },
           "listen": 3724,
@@ -83,7 +85,7 @@
         },
         "world": {
           "forward": {
-            "host": "192.168.11.30",
+            "host": "127.0.0.1",
             "port": 8086
           },
           "listen": 8085,
@@ -100,47 +102,19 @@
         "capture": {
           "dump": false,
           "focus": [
-            "ON",
-            "CMSG_MESSAGECHAT_SAY",
-            "SMSG_MESSAGECHAT",
-            "CMSG_WHO",
-            "SMSG_WHO",
-            "CMSG_CAST_SPELL",
-            "SMSG_SPELL_START",
-            "SMSG_SPELL_GO",
-            "SMSG_AURA_UPDATE",
-            "CMSG_CANCEL_AURA",
-            "CMSG_CANCEL_MOUNT_AURA",
-            "SMSG_UPDATE_OBJECT",
-            "SMSG_MOVE_SET_RUN_SPEED",
-            "SMSG_MOVE_SET_WALK_SPEED",
-            "SMSG_MOVE_SET_SWIM_SPEED",
-            "SMSG_MOVE_SET_FLIGHT_SPEED",
-            "CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK",
-            "SMSG_PLAYER_MOVE",
-            "MSG_MOVE_START_FORWARD",
-            "MSG_MOVE_STOP",
-            "MSG_MOVE_HEARTBEAT",
-            "MSG_MOVE_START_TURN_LEFT",
-            "MSG_MOVE_START_TURN_RIGHT",
-            "MSG_MOVE_STOP_TURN",
-            "MSG_MOVE_START_BACKWARD",
-            "MSG_MOVE_START_STRAFE_LEFT",
-            "MSG_MOVE_START_STRAFE_RIGHT",
-            "MSG_MOVE_STOP_STRAFE",
-            "MSG_MOVE_SET_FACING",
-            "MSG_MOVE_JUMP",
-            "MSG_MOVE_FALL_LAND",
-            "SMSG_MOVE_TELEPORT",
-            "CMSG_MOVE_TELEPORT_ACK",
-            "SMSG_TRANSFER_PENDING",
-            "SMSG_NEW_WORLD",
-            "MSG_MOVE_WORLDPORT_ACK",
-            "SMSG_MOVE_UPDATE_RUN_SPEED",
-            "SMSG_MOVE_UPDATE_WALK_SPEED",
-            "SMSG_MOVE_UPDATE_TURN_RATE",
-            "SMSG_MOVE_SET_TURN_RATE",
-            "SMSG_MOVE_UPDATE_TELEPORT"
+         "ON",
+          "SMSG_PLAYER_MOVE",
+          "MSG_MOVE_JUMP",
+          "MSG_MOVE_HEARTBEAT",
+          "MSG_MOVE_FALL_LAND",
+          "MSG_MOVE_START_FORWARD",
+          "MSG_MOVE_STOP",
+          "MSG_MOVE_START_STRAFE_LEFT",
+          "MSG_MOVE_START_STRAFE_RIGHT",
+          "MSG_MOVE_STOP_STRAFE",
+          "MSG_MOVE_START_TURN_LEFT",
+          "MSG_MOVE_START_TURN_RIGHT",
+          "MSG_MOVE_STOP_TURN"
           ],
           "profile": ""
         },
@@ -178,47 +152,19 @@
           "profile": "skyfire548",
           "dump": true,
           "focus": [
-            "ON",
-            "CMSG_MESSAGECHAT_SAY",
-            "SMSG_MESSAGECHAT",
-            "CMSG_WHO",
-            "SMSG_WHO",
-            "CMSG_CAST_SPELL",
-            "SMSG_SPELL_START",
-            "SMSG_SPELL_GO",
-            "SMSG_AURA_UPDATE",
-            "CMSG_CANCEL_AURA",
-            "CMSG_CANCEL_MOUNT_AURA",
-            "SMSG_UPDATE_OBJECT",
-            "SMSG_MOVE_SET_RUN_SPEED",
-            "SMSG_MOVE_SET_WALK_SPEED",
-            "SMSG_MOVE_SET_SWIM_SPEED",
-            "SMSG_MOVE_SET_FLIGHT_SPEED",
-            "CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK",
+          "ON",
             "SMSG_PLAYER_MOVE",
+            "MSG_MOVE_JUMP",
+            "MSG_MOVE_HEARTBEAT",
+            "MSG_MOVE_FALL_LAND",
             "MSG_MOVE_START_FORWARD",
             "MSG_MOVE_STOP",
-            "MSG_MOVE_HEARTBEAT",
-            "MSG_MOVE_START_TURN_LEFT",
-            "MSG_MOVE_START_TURN_RIGHT",
-            "MSG_MOVE_STOP_TURN",
-            "MSG_MOVE_START_BACKWARD",
             "MSG_MOVE_START_STRAFE_LEFT",
             "MSG_MOVE_START_STRAFE_RIGHT",
             "MSG_MOVE_STOP_STRAFE",
-            "MSG_MOVE_SET_FACING",
-            "MSG_MOVE_JUMP",
-            "MSG_MOVE_FALL_LAND",
-            "SMSG_MOVE_TELEPORT",
-            "CMSG_MOVE_TELEPORT_ACK",
-            "SMSG_TRANSFER_PENDING",
-            "SMSG_NEW_WORLD",
-            "MSG_MOVE_WORLDPORT_ACK",
-            "SMSG_MOVE_UPDATE_RUN_SPEED",
-            "SMSG_MOVE_UPDATE_WALK_SPEED",
-            "SMSG_MOVE_UPDATE_TURN_RATE",
-            "SMSG_MOVE_SET_TURN_RATE",
-            "SMSG_MOVE_UPDATE_TELEPORT"
+            "MSG_MOVE_START_TURN_LEFT",
+            "MSG_MOVE_START_TURN_RIGHT",
+            "MSG_MOVE_STOP_TURN"
           ]
         },
         "adapters": {
@@ -253,7 +199,7 @@
       "routes": {
         "auth": {
           "forward": {
-            "host": "192.168.11.30",
+            "host": "127.0.0.1",
             "port": 3794
           },
           "listen": 3724,
@@ -262,7 +208,7 @@
         },
         "world": {
           "forward": {
-            "host": "192.168.11.30",
+            "host": "127.0.0.1",
             "port": 8095
           },
           "listen": 8085,
@@ -284,7 +230,7 @@
         "auth": {
           "listen": 3724,
           "forward": {
-            "host": "192.168.11.30",
+            "host": "127.0.0.1",
             "port": 3734
           },
           "name": "auth",
@@ -293,7 +239,7 @@
         "world": {
           "listen": 8085,
           "forward": {
-            "host": "192.168.11.30",
+            "host": "127.0.0.1",
             "port": 8035
           },
           "name": "world",
@@ -313,51 +259,19 @@
         "capture": {
           "dump": true,
           "focus": [
-            "CMSG_MESSAGECHAT_SAY",
-            "SMSG_MESSAGECHAT",
-            "CMSG_WHO",
-            "SMSG_WHO",
-            "CMSG_CAST_SPELL",
-            "SMSG_SPELL_START",
-            "SMSG_SPELL_GO",
-            "SMSG_AURA_UPDATE",
-            "SMSG_AURA_UPDATE_ALL",
-            "SMSG_AURA_UPDATE_SINGLE",
-            "CMSG_CANCEL_AURA",
-            "CMSG_CANCEL_MOUNT_AURA",
-            "SMSG_UPDATE_OBJECT",
-            "SMSG_MOVE_SET_RUN_SPEED",
-            "SMSG_MOVE_SET_WALK_SPEED",
-            "SMSG_MOVE_SET_SWIM_SPEED",
-            "SMSG_MOVE_SET_FLIGHT_SPEED",
-            "CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK",
-            "SMSG_PLAYER_MOVE",
-            "MSG_MOVE_START_FORWARD",
-            "MSG_MOVE_STOP",
-            "MSG_MOVE_HEARTBEAT",
-            "MSG_MOVE_START_TURN_LEFT",
-            "MSG_MOVE_START_TURN_RIGHT",
-            "MSG_MOVE_STOP_TURN",
-            "MSG_MOVE_START_BACKWARD",
-            "MSG_MOVE_START_STRAFE_LEFT",
-            "MSG_MOVE_START_STRAFE_RIGHT",
-            "MSG_MOVE_STOP_STRAFE",
-            "MSG_MOVE_SET_FACING",
-            "MSG_MOVE_JUMP",
-            "MSG_MOVE_FALL_LAND",
-            "SMSG_MOVE_TELEPORT",
-            "CMSG_MOVE_TELEPORT_ACK",
-            "SMSG_TRANSFER_PENDING",
-            "SMSG_NEW_WORLD",
-            "MSG_MOVE_WORLDPORT_ACK",
-            "SMSG_MOVE_UPDATE_RUN_SPEED",
-            "SMSG_MOVE_UPDATE_WALK_SPEED",
-            "SMSG_MOVE_UPDATE_TURN_RATE",
-            "SMSG_MOVE_SET_TURN_RATE",
-            "SMSG_MOVE_UPDATE_TELEPORT",
-            "SMSG_SET_VEHICLE_REC_ID",
-            "SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA",
-            "ON"
+                "ON",
+                "SMSG_PLAYER_MOVE",
+                "MSG_MOVE_JUMP",
+                "MSG_MOVE_HEARTBEAT",
+                "MSG_MOVE_FALL_LAND",
+                "MSG_MOVE_START_FORWARD",
+                "MSG_MOVE_STOP",
+                "MSG_MOVE_START_STRAFE_LEFT",
+                "MSG_MOVE_START_STRAFE_RIGHT",
+                "MSG_MOVE_STOP_STRAFE",
+                "MSG_MOVE_START_TURN_LEFT",
+                "MSG_MOVE_START_TURN_RIGHT",
+                "MSG_MOVE_STOP_TURN"
           ],
           "profile": "pandaria548"
         },

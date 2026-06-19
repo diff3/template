@@ -5,7 +5,10 @@ server/
 shared
 logs/
 data/
-.vscode
+dbc/
+maps/
+db2/
+.vscode/
 
 # Python
 __pycache__/
@@ -14,8 +17,13 @@ __pycache__/
 
 # Env files (optional, om du inte vill committa .env)
 # .env
+docker/.generated.env
 
 # OS junk
 .DS_Store
 Thumbs.db
 docs
+memory
+.codex
+.agents
+.pytest_cache/

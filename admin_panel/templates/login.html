@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
 {% block content %}
-<section class="card narrow">
+<section class="card narrow login-card">
     <h1>Login</h1>
-    <p class="muted">Uses the auth database account table and local SRP6 verifier checking.</p>
     {% if error %}
     <div class="flash error">{{ error }}</div>
     {% endif %}
@@ -18,5 +17,30 @@
         </label>
         <button type="submit">Login</button>
     </form>
+    <div class="server-status">
+        <h2>Server status</h2>
+        <div class="status-row">
+            <span>Database</span>
+            <strong class="{{ 'status-ok' if status.database else 'status-bad' }}">{{ 'Online' if status.database else 'Offline' }}</strong>
+        </div>
+        <div class="status-row">
+            <span>Auth</span>
+            <strong class="{{ 'status-ok' if status.authserver else 'status-bad' }}">{{ 'Online' if status.authserver else 'Offline' }}</strong>
+        </div>
+        <div class="status-row">
+            <span>World</span>
+            <strong class="{{ 'status-ok' if status.worldserver else 'status-bad' }}">
+                {% if status.worldserver and status.realm %}{{ status.realm }}: {% endif %}{{ 'Online' if status.worldserver else 'Offline' }}
+            </strong>
+        </div>
+        <div class="status-row">
+            <span>Proxy</span>
+            <strong class="{{ 'status-ok' if status.proxyserver else 'status-bad' }}">{{ 'Online' if status.proxyserver else 'Offline' }}</strong>
+        </div>
+        <div class="status-row">
+            <span>Players</span>
+            <strong class="{{ 'status-ok' if status.online_count else 'status-bad' }}">{{ status.online_count }}: Online</strong>
+        </div>
+    </div>
 </section>
 {% endblock %}

@@ -3,40 +3,58 @@
 {% block content %}
 <section class="card">
     <div class="section-head">
+        <h1>MOTD</h1>
+    </div>
+    <form method="post" action="{{ url_for('realm_motd_update') }}" class="form-grid">
+        <label class="full-row">
+            Message
+            <input type="text" name="motd" value="{{ motd }}">
+        </label>
+        <div class="form-actions">
+            <button type="submit">Save MOTD</button>
+        </div>
+    </form>
+</section>
+<section class="card" data-lazy-table>
+    <div class="section-head">
         <h1>Realmlist</h1>
-        <a class="button-link" href="{{ url_for('realm_create') }}">Create realm</a>
+        <div class="actions">
+            <a class="button-link" href="{{ url_for('realm_create') }}">Create realm</a>
+        </div>
+    </div>
+    <div class="table-tools">
+        <label class="search-field">
+            Search
+            <input type="search" placeholder="Name, type or id" autocomplete="off" data-lazy-search>
+        </label>
+        <span class="muted" data-lazy-count>{{ realms|length }} total</span>
     </div>
     <table>
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Address</th>
-                <th>Port</th>
-                <th>Icon</th>
-                <th>Flag</th>
-                <th>Timezone</th>
-                <th>AllowedSecurityLevel</th>
+                <th>Type</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             {% for realm in realms %}
-            <tr>
+            {% set realm_type = realm_types.get(realm.icon, realm.icon) %}
+            <tr data-row-href="{{ url_for('realm_edit', realm_id=realm.id) }}" data-search="{{ realm.id }} {{ realm.name|lower }} {{ realm_type|string|lower }}">
                 <td>{{ realm.id }}</td>
                 <td>{{ realm.name }}</td>
-                <td>{{ realm.address }}</td>
-                <td>{{ realm.port }}</td>
-                <td>{{ realm.icon }}</td>
-                <td>{{ realm.flag }}</td>
-                <td>{{ realm.timezone }}</td>
-                <td>{{ realm.allowedSecurityLevel }}</td>
+                <td>{{ realm_type }}</td>
                 <td class="actions">
                     <a href="{{ url_for('realm_edit', realm_id=realm.id) }}">Edit</a>
                     <form action="{{ url_for('realm_delete', realm_id=realm.id) }}" method="post" onsubmit="return confirm('Delete realm {{ realm.name }}?');">
                         <button type="submit" class="danger">Delete</button>
                     </form>
                 </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="muted">No realms found.</td>
             </tr>
             {% endfor %}
         </tbody>

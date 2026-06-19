@@ -4,22 +4,37 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}PyPandaria Admin{% endblock %}</title>
+    <script>
+        try {
+            if (localStorage.getItem("adminTheme") === "dark") {
+                document.documentElement.dataset.theme = "dark";
+            }
+        } catch (error) {
+        }
+    </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header class="topbar">
         <div class="wrap">
             <div class="brand"><a href="{{ url_for('index') }}">PyPandaria Admin</a></div>
-            {% if session.get('account_id') %}
-            <nav class="nav">
-                <a href="{{ url_for('accounts') }}">Accounts</a>
-                <a href="{{ url_for('characters') }}">Characters</a>
-                <a href="{{ url_for('realmlist') }}">Realmlist</a>
-                <form action="{{ url_for('logout') }}" method="post">
-                    <button type="submit">Logout {{ session.get('username', '') }}</button>
-                </form>
-            </nav>
-            {% endif %}
+            <div class="top-actions">
+                {% if session.get('account_id') %}
+                <nav class="nav">
+                    <a href="{{ url_for('accounts') }}">Accounts</a>
+                    <a href="{{ url_for('characters') }}">Characters</a>
+                    <a href="{{ url_for('lookup') }}">Lookup</a>
+                    <a href="{{ url_for('commands_help') }}">Commands</a>
+                    <a href="{{ url_for('realmlist') }}">Realmlist</a>
+                    <a href="{{ url_for('teleports') }}">Teleports</a>
+                    <a href="{{ url_for('world') }}">World</a>
+                    <form action="{{ url_for('logout') }}" method="post">
+                        <button type="submit">Logout {{ session.get('username', '') }}</button>
+                    </form>
+                </nav>
+                {% endif %}
+                <button type="button" class="theme-toggle" data-theme-toggle>Dark</button>
+            </div>
         </div>
     </header>
     <main class="wrap">
@@ -34,5 +49,8 @@
         {% endwith %}
         {% block content %}{% endblock %}
     </main>
+    <script src="{{ url_for('static', filename='table-filter.js') }}"></script>
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,10 +1,19 @@
 {% extends "base.html" %}
 {% block title %}Accounts{% endblock %}
 {% block content %}
-<section class="card">
+<section class="card" data-lazy-table>
     <div class="section-head">
         <h1>Accounts</h1>
-        <a class="button-link" href="{{ url_for('account_create') }}">Create account</a>
+        <div class="actions">
+            <a class="button-link" href="{{ url_for('account_create') }}">Create account</a>
+        </div>
+    </div>
+    <div class="table-tools">
+        <label class="search-field">
+            Search
+            <input type="search" placeholder="Username, email, expansion or GM" autocomplete="off" data-lazy-search>
+        </label>
+        <span class="muted" data-lazy-count>{{ accounts|length }} total</span>
     </div>
     <table>
         <thead>
@@ -13,38 +22,32 @@
                 <th>Username</th>
                 <th>Email</th>
                 <th>Expansion</th>
-                <th>Locked</th>
-                <th>Last IP</th>
-                <th>OS</th>
                 <th>GM</th>
-                <th>Access</th>
-                <th>Ban</th>
+                <th>Banned</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             {% for account in accounts %}
-            <tr>
+            {% set expansion_name = expansion_names.get(account.expansion|int, "MoP" if account.expansion|int > 4 else account.expansion) %}
+            {% set gm_name = gm_levels.get(account.gmlevel|int, 'Custom') %}
+            <tr data-row-href="{{ url_for('account_edit', account_id=account.id) }}" data-search="{{ account.id }} {{ account.username|lower }} {{ account.email|lower }} {{ expansion_name|lower }} {{ account.gmlevel }} {{ gm_name|lower }} {% if account.banned %}banned{% else %}active{% endif %}">
                 <td>{{ account.id }}</td>
                 <td>{{ account.username }}</td>
                 <td>{{ account.email }}</td>
-                <td>{{ account.expansion }}</td>
-                <td>{{ account.locked }}</td>
-                <td>{{ account.last_ip }}</td>
-                <td>{{ account.os }}</td>
-                <td>{{ account.gmlevel }}</td>
-                <td>{{ account.access_rows or "" }}</td>
-                <td>
-                    {% if account.banned_active %}
-                        active: {{ account.banreason or "" }}
-                    {% endif %}
-                </td>
+                <td>{{ expansion_name }}</td>
+                <td title="{{ gm_name }}">{{ account.gmlevel }}</td>
+                <td>{% if account.banned %}Yes{% else %}No{% endif %}</td>
                 <td class="actions">
                     <a href="{{ url_for('account_edit', account_id=account.id) }}">Edit</a>
-                    <form action="{{ url_for('account_delete', account_id=account.id) }}" method="post" onsubmit="return confirm('Delete account {{ account.username }}?');">
+                    <form action="{{ url_for('account_delete', account_id=account.id) }}" method="post" onsubmit="return confirm('Delete account {{ account.username }} and all related character data?');">
                         <button type="submit" class="danger">Delete</button>
                     </form>
                 </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" class="muted">No accounts found.</td>
             </tr>
             {% endfor %}
         </tbody>

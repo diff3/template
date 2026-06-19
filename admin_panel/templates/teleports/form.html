@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{% if teleport %}Edit Teleport{% else %}Create Teleport{% endif %}{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>{% if teleport %}Edit Teleport: {{ teleport.name }}{% else %}Create Teleport{% endif %}</h1>
+    <form method="post" class="form-grid">
+        <label>
+            Name
+            <input type="text" name="name" value="{{ teleport.name if teleport else '' }}" required>
+        </label>
+        <label>
+            Map
+            <input type="number" name="map" value="{{ teleport.map if teleport else 0 }}" required>
+            {% if teleport %}<span class="field-note">{{ teleport.map_name }}</span>{% endif %}
+        </label>
+        <label>
+            X
+            <input type="number" step="0.01" name="position_x" value="{{ teleport.position_x if teleport else 0 }}" required>
+        </label>
+        <label>
+            Y
+            <input type="number" step="0.01" name="position_y" value="{{ teleport.position_y if teleport else 0 }}" required>
+        </label>
+        <label>
+            Z
+            <input type="number" step="0.01" name="position_z" value="{{ teleport.position_z if teleport else 0 }}" required>
+        </label>
+        <label>
+            Orientation
+            <input type="number" step="0.01" name="orientation" value="{{ teleport.orientation if teleport else 0 }}" required>
+        </label>
+        <div class="form-actions">
+            <button type="submit">Save</button>
+            <a class="button-link secondary" href="{{ url_for('teleports') }}">Back</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

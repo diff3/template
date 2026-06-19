@@ -1,50 +1,74 @@
 {% extends "base.html" %}
 {% block title %}Characters{% endblock %}
 {% block content %}
-<section class="card">
+<section class="card" data-lazy-table>
     <div class="section-head">
         <h1>Characters</h1>
-        <span class="muted">Showing latest 500 rows</span>
     </div>
-    <table>
+    <div class="table-tools">
+        <div class="filter-fields">
+            <label class="search-field">
+                Search
+                <input type="search" placeholder="Name, account, class, race or map" autocomplete="off" data-lazy-search>
+            </label>
+            <div class="faction-filter">
+                <fieldset class="radio-filter">
+                    <legend>Faction</legend>
+                    <label><input type="radio" name="faction" value="" data-lazy-faction checked> Both</label>
+                    <label><input type="radio" name="faction" value="alliance" data-lazy-faction> Alliance</label>
+                    <label><input type="radio" name="faction" value="horde" data-lazy-faction> Horde</label>
+                </fieldset>
+                <label class="online-filter"><input type="checkbox" data-lazy-online> Online only</label>
+                <span class="muted faction-summary">{{ character_factions.alliance }} Alliance / {{ character_factions.horde }} Horde players</span>
+            </div>
+        </div>
+        <span class="muted" data-lazy-count>{{ characters|length }} total</span>
+    </div>
+    <table class="characters-table">
         <thead>
             <tr>
-                <th>Guid</th>
-                <th>Realm</th>
-                <th>Account</th>
+                <th>ID</th>
                 <th>Name</th>
+                <th>Account</th>
+                <th>Level</th>
                 <th>Race</th>
                 <th>Class</th>
-                <th>Level</th>
-                <th>Money</th>
                 <th>Map</th>
-                <th>Pos</th>
-                <th>Health</th>
-                <th>Power</th>
-                <th></th>
             </tr>
         </thead>
         <tbody>
             {% for character in characters %}
-            <tr>
+            <tr class="{% if character.online %}online-row{% endif %}" data-row-href="{{ url_for('account_edit', account_id=character.account) }}" data-faction="{{ character.faction }}" data-online="{% if character.online %}1{% else %}0{% endif %}" data-search="{{ character.guid }} {{ character.name|lower }} {{ character.account }} {{ character.account_name|lower }} {{ character.level }} {{ character.race_name|lower }} {{ character.class_name|lower }} {{ character.map }} {{ character.map_name|lower }} {% if character.zone_name %}{{ character.zone }} {{ character.zone_name|lower }}{% endif %} {{ character.location_name|lower }} {{ character.faction }} {% if character.online %}online{% endif %}">
                 <td>{{ character.guid }}</td>
-                <td>{{ character.realm }}</td>
-                <td>{{ character.account }}</td>
-                <td>{{ character.name }}</td>
-                <td>{{ character.race }}</td>
-                <td>{{ character.class_id }}</td>
-                <td>{{ character.level }}</td>
-                <td>{{ character.money }}</td>
-                <td>{{ character.map }}</td>
-                <td>{{ character.position_x }}, {{ character.position_y }}, {{ character.position_z }}</td>
-                <td>{{ character.health }}</td>
-                <td>{{ character.power1 }}</td>
-                <td class="actions">
-                    <a href="{{ url_for('character_edit', guid=character.guid) }}">Edit</a>
-                    <form action="{{ url_for('character_delete', guid=character.guid) }}" method="post" onsubmit="return confirm('Delete character {{ character.name }}?');">
-                        <button type="submit" class="danger">Delete</button>
-                    </form>
+                <td>
+                    <span class="character-name">
+                        {% if character.faction_icon %}
+                        <img class="faction-icon" src="{{ url_for('static', filename=character.faction_icon) }}" alt="" title="{{ character.faction|capitalize }}">
+                        {% else %}
+                        <span class="faction-dot faction-{{ character.faction }}" title="{{ character.faction|capitalize }}"></span>
+                        {% endif %}
+                        <a href="{{ url_for('account_edit', account_id=character.account) }}">{{ character.name }}</a>
+                    </span>
                 </td>
+                <td><a href="{{ url_for('account_edit', account_id=character.account) }}">{{ character.account_name }}</a></td>
+                <td>{{ character.level }}</td>
+                <td title="Race {{ character.race }}">
+                    <span class="icon-label">
+                        {% if character.race_icon %}<img class="character-icon" src="{{ url_for('static', filename=character.race_icon) }}" alt="" title="{{ character.race_name }}">{% endif %}
+                        {{ character.race_name }}
+                    </span>
+                </td>
+                <td title="Class {{ character.class_id }}">
+                    <span class="icon-label">
+                        {% if character.class_icon %}<img class="character-icon" src="{{ url_for('static', filename=character.class_icon) }}" alt="" title="{{ character.class_name }}">{% endif %}
+                        {{ character.class_name }}
+                    </span>
+                </td>
+                <td title="Map {{ character.map }}{% if character.zone_name %}, Zone {{ character.zone }}{% endif %}">{{ character.location_name }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" class="muted">No characters found.</td>
             </tr>
             {% endfor %}
         </tbody>

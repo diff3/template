@@ -1,0 +1,9 @@
+.git
+.pytest_cache
+__pycache__
+*.pyc
+logs/*
+data/captures/*
+data/debug/*
+.env
+docker/.env

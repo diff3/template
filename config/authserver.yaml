@@ -2,7 +2,9 @@ authserver:
   host: 0.0.0.0
   port: 3720
   logging:
-    write_to_log: true
+    write_to_log: false
+    logging_levels: Warning, Error, Info, Success
+    logging_file_levels: Error
     log_file: authserver.log
   output:
     raw: false

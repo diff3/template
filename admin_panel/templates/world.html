@@ -1,0 +1,578 @@
+{% extends "base.html" %}
+{% block title %}World State{% endblock %}
+{% block content %}
+<section class="card">
+    <div class="section-head">
+        <h1>World State</h1>
+        <span class="muted">Last updated <span data-world-updated>{{ dashboard.generated_time }}</span></span>
+    </div>
+    <div class="stats">
+        <span class="stat">
+            <span class="stat-label">Transports</span>
+            <strong data-transport-count>{{ dashboard.transport_count }}</strong>
+            <span class="stat-note">Runtime snapshot from worldserver</span>
+        </span>
+        <span class="stat">
+            <span class="stat-label">Weather Zones</span>
+            <strong>{{ dashboard.weather_count }}</strong>
+            <span class="stat-note">Runtime weather state</span>
+        </span>
+    </div>
+    {% if not dashboard.snapshot_available %}
+    <p class="muted">No runtime snapshot is available yet. Start the worldserver and refresh after the first runtime tick.</p>
+    {% endif %}
+    <div class="world-search">
+        <label class="search-field">
+            Search
+            <input
+                type="search"
+                data-world-search
+                placeholder="Name, weather, type, zone, continent"
+                autocomplete="off"
+            >
+        </label>
+        <span class="muted" data-world-search-count></span>
+    </div>
+    <div class="world-search-results" data-world-search-results hidden></div>
+</section>
+
+<section class="card">
+    <div class="section-head">
+        <h2>Transport Runtime</h2>
+        <div class="transport-toolbar">
+            <span class="muted" data-copy-feedback>{{ dashboard.transport_count }} routes</span>
+            <label>
+                Refresh
+                <select data-refresh-select>
+                    <option value="1000">1s</option>
+                    <option value="5000" selected>5s</option>
+                    <option value="10000">10s</option>
+                    <option value="60000">60s</option>
+                </select>
+            </label>
+        </div>
+    </div>
+    <div
+        class="transport-dashboard"
+        data-transport-dashboard
+        data-runtime-url="{{ url_for('world_runtime_json') }}"
+    >
+        {% for group in dashboard.transport_groups %}
+        <section class="transport-group" data-transport-group="{{ group.key }}">
+            <div class="transport-group-head">
+                <h3>{{ group.label }}</h3>
+                <span class="muted" data-group-count="{{ group.key }}">{{ group.count }}</span>
+            </div>
+            <div class="transport-list">
+                {% for transport in group.transports %}
+                <article
+                    class="transport-tile"
+                    data-transport-guid="{{ transport.world_guid }}"
+                    data-search="{{ transport.search_text }}"
+                >
+                    <div class="transport-main">
+                        <div>
+                            <h4>{{ transport.name }}</h4>
+                            <span class="field-note">Entry {{ transport.entry }} / GUID {{ transport.world_guid }} / Path {{ transport.path_id }} / {{ transport.label_source }}{% if transport.synced_variant_count %} / synced {{ transport.synced_variant_count }} variants{% endif %}</span>
+                        </div>
+                        <span class="status-pill {{ transport.status_class }}">{{ transport.status_label }}</span>
+                    </div>
+                    <div class="transport-details">
+                        <span>
+                            <strong>{{ transport.passenger_count }}</strong>
+                            <span class="field-note">{{ transport.passenger_label }}</span>
+                        </span>
+                        <span>
+                            <strong>{{ transport.phase_label }}</strong>
+                            <span class="field-note">{{ transport.phase_seconds }}</span>
+                        </span>
+                        <span>
+                            <strong>{{ transport.location_name }}</strong>
+                            {% if transport.location_detail %}
+                            <span class="field-note">{{ transport.location_detail }}</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="transport-footer">
+                        {% if transport.position_label %}
+                        <code class="position-code">{{ transport.position_label }}</code>
+                        <button type="button" data-copy-command="{{ transport.copy_command }}">Copy Position</button>
+                        {% else %}
+                        <span class="muted">No runtime position</span>
+                        {% endif %}
+                    </div>
+                    <div class="phase-meter" title="{{ transport.phase_label }}">
+                        <span style="width: {{ transport.phase_percent }}%"></span>
+                    </div>
+                </article>
+                {% else %}
+                <p class="muted transport-empty">No {{ group.label|lower }} in the runtime snapshot.</p>
+                {% endfor %}
+            </div>
+        </section>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="card">
+    <div class="section-head">
+        <h2>Weather</h2>
+        <span class="muted" data-weather-count>{{ dashboard.weather_count }} zones</span>
+    </div>
+    <div class="weather-dashboard" data-weather-dashboard>
+        {% for weather in dashboard.weather %}
+        <article
+            class="weather-tile"
+            data-weather-zone="{{ weather.zone }}"
+            data-weather-hash="{{ weather.weather_hash }}"
+            data-search="{{ weather.search_text }}"
+        >
+            <span class="weather-icon" aria-hidden="true">{{ weather.weather_icon }}</span>
+            <div class="weather-body">
+                <div class="weather-main">
+                    <button
+                        type="button"
+                        class="weather-title-button"
+                        data-copy-command=".tele {{ weather.teleport_name }}"
+                        title="Copy teleport command"
+                    >{{ weather.zone_name }}</button>
+                </div>
+                <strong>{{ weather.current }}</strong>
+            </div>
+        </article>
+        {% else %}
+        <p class="muted weather-empty">No weather rows found in the runtime snapshot.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<div class="world-toast" data-world-toast hidden></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const initialWorldDashboard = {{ dashboard|tojson }};
+
+document.querySelectorAll("[data-refresh-select]").forEach((select) => {
+    let stored = "";
+    try {
+        stored = localStorage.getItem("worldTransportRefreshMs") || "";
+    } catch (error) {
+        stored = "";
+    }
+    if (stored && select.querySelector(`option[value="${stored}"]`)) {
+        select.value = stored;
+    }
+});
+
+function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+    }[char]));
+}
+
+function cssEscape(value) {
+    if (window.CSS && typeof window.CSS.escape === "function") {
+        return window.CSS.escape(String(value));
+    }
+    return String(value).replace(/"/g, '\\"');
+}
+
+function renderTransport(transport) {
+    const position = transport.position_label
+        ? `<code class="position-code">${escapeHtml(transport.position_label)}</code>
+           <button type="button" data-copy-command="${escapeHtml(transport.copy_command)}">Copy Position</button>`
+        : `<span class="muted">No runtime position</span>`;
+    return `
+        <article
+            class="transport-tile"
+            data-transport-guid="${escapeHtml(transport.world_guid)}"
+            data-search="${escapeHtml(transport.search_text)}"
+        >
+            <div class="transport-main">
+                <div>
+                    <h4>${escapeHtml(transport.name)}</h4>
+                    <span class="field-note">Entry ${escapeHtml(transport.entry)} / GUID ${escapeHtml(transport.world_guid)} / Path ${escapeHtml(transport.path_id)} / ${escapeHtml(transport.label_source)}${transport.synced_variant_count ? ` / synced ${escapeHtml(transport.synced_variant_count)} variants` : ""}</span>
+                </div>
+                <span class="status-pill ${escapeHtml(transport.status_class)}">${escapeHtml(transport.status_label)}</span>
+            </div>
+            <div class="transport-details">
+                <span>
+                    <strong>${escapeHtml(transport.passenger_count)}</strong>
+                    <span class="field-note">${escapeHtml(transport.passenger_label)}</span>
+                </span>
+                <span>
+                    <strong>${escapeHtml(transport.phase_label)}</strong>
+                    <span class="field-note">${escapeHtml(transport.phase_seconds)}</span>
+                </span>
+                <span>
+                    <strong>${escapeHtml(transport.location_name)}</strong>
+                    ${transport.location_detail ? `<span class="field-note">${escapeHtml(transport.location_detail)}</span>` : ""}
+                </span>
+            </div>
+            <div class="transport-footer">${position}</div>
+            <div class="phase-meter" title="${escapeHtml(transport.phase_label)}">
+                <span style="width: ${Number(transport.phase_percent || 0)}%"></span>
+            </div>
+        </article>`;
+}
+
+function renderTransportGroups(dashboard) {
+    const root = document.querySelector("[data-transport-dashboard]");
+    if (!root) {
+        return;
+    }
+    const groups = Array.isArray(dashboard.transport_groups) ? dashboard.transport_groups : [];
+    root.innerHTML = groups.map((group) => {
+        const transports = Array.isArray(group.transports) ? group.transports : [];
+        const content = transports.length
+            ? transports.map(renderTransport).join("")
+            : `<p class="muted transport-empty">No ${escapeHtml(String(group.label || "").toLowerCase())} in the runtime snapshot.</p>`;
+        return `
+            <section class="transport-group" data-transport-group="${escapeHtml(group.key)}">
+                <div class="transport-group-head">
+                    <h3>${escapeHtml(group.label)}</h3>
+                    <span class="muted" data-group-count="${escapeHtml(group.key)}">${escapeHtml(group.count || 0)}</span>
+                </div>
+                <div class="transport-list">${content}</div>
+            </section>`;
+    }).join("");
+}
+
+function renderWeather(weather) {
+    return `
+        <article
+            class="weather-tile"
+            data-weather-zone="${escapeHtml(weather.zone)}"
+            data-weather-hash="${escapeHtml(weather.weather_hash || "")}"
+            data-search="${escapeHtml(weather.search_text)}"
+        >
+            <span class="weather-icon" aria-hidden="true">${escapeHtml(weather.weather_icon || "🌍")}</span>
+            <div class="weather-body">
+                <div class="weather-main">
+                    <button
+                        type="button"
+                        class="weather-title-button"
+                        data-copy-command=".tele ${escapeHtml(weather.teleport_name)}"
+                        title="Copy teleport command"
+                    >${escapeHtml(weather.zone_name)}</button>
+                </div>
+                <strong>${escapeHtml(weather.current)}</strong>
+            </div>
+        </article>`;
+}
+
+function renderWeatherDashboard(dashboard) {
+    const root = document.querySelector("[data-weather-dashboard]");
+    if (!root) {
+        return;
+    }
+    const weather = Array.isArray(dashboard.weather) ? dashboard.weather : [];
+    if (!weather.length) {
+        root.innerHTML = `<p class="muted weather-empty">No weather rows found in the runtime snapshot.</p>`;
+        return;
+    }
+
+    const seen = new Set();
+    const template = document.createElement("template");
+    root.querySelectorAll(".weather-empty").forEach((item) => item.remove());
+
+    weather.forEach((item) => {
+        const zone = String(item.zone ?? "");
+        seen.add(zone);
+        const existing = root.querySelector(`.weather-tile[data-weather-zone="${cssEscape(zone)}"]`);
+        const hash = String(item.weather_hash || "");
+        if (existing && existing.dataset.weatherHash === hash) {
+            root.appendChild(existing);
+            return;
+        }
+        template.innerHTML = renderWeather(item).trim();
+        const next = template.content.firstElementChild;
+        if (existing) {
+            existing.replaceWith(next);
+        } else {
+            root.appendChild(next);
+        }
+    });
+
+    root.querySelectorAll(".weather-tile[data-weather-zone]").forEach((tile) => {
+        if (!seen.has(String(tile.dataset.weatherZone || ""))) {
+            tile.remove();
+        }
+    });
+}
+
+function normalizeSearch(value) {
+    return String(value || "").trim().toLowerCase();
+}
+
+function searchTokens(value) {
+    return normalizeSearch(value).split(/\s+/).filter(Boolean);
+}
+
+function matchesSearch(searchText, tokens) {
+    const haystack = normalizeSearch(searchText);
+    return !tokens.length || tokens.every((token) => haystack.includes(token));
+}
+
+function resultTypeIcon(type) {
+    return {
+        weather: "🌍",
+        transport: "⇄",
+        teleport: "⌖",
+        zone: "◇",
+        continent: "◎",
+        command: "/",
+    }[type] || "•";
+}
+
+function renderSearchResult(result) {
+    const type = String(result.type || "result");
+    const action = result.action || {};
+    const icon = result.icon || resultTypeIcon(type);
+    let actionButton = "";
+    if (action.kind === "copy" && action.command) {
+        actionButton = `<button type="button" data-copy-search-result="${escapeHtml(action.command)}">${escapeHtml(action.label || "Copy")}</button>`;
+    } else if (action.kind === "section" && action.target) {
+        actionButton = `<button type="button" data-scroll-section="${escapeHtml(action.target)}">${escapeHtml(action.label || "Open")}</button>`;
+    }
+    return `
+        <article class="world-search-result" data-result-type="${escapeHtml(type)}">
+            <span class="world-search-icon" aria-hidden="true">${escapeHtml(icon)}</span>
+            <div class="world-search-result-body">
+                <span class="world-search-result-type">${escapeHtml(type)}</span>
+                <strong>${escapeHtml(result.title || "")}</strong>
+                ${result.subtitle ? `<span class="field-note">${escapeHtml(result.subtitle)}</span>` : ""}
+            </div>
+            ${actionButton}
+        </article>`;
+}
+
+function renderSearchResults(dashboard, tokens) {
+    const root = document.querySelector("[data-world-search-results]");
+    if (!root) {
+        return 0;
+    }
+    const results = Array.isArray(dashboard.search_results) ? dashboard.search_results : [];
+    if (!tokens.length) {
+        root.hidden = true;
+        root.innerHTML = "";
+        return 0;
+    }
+
+    const matched = results.filter((result) => matchesSearch(result.search_text, tokens));
+    root.hidden = false;
+    root.innerHTML = matched.length
+        ? matched.map(renderSearchResult).join("")
+        : `<p class="muted world-search-empty">No runtime results found.</p>`;
+    return matched.length;
+}
+
+function applyWorldSearch() {
+    const input = document.querySelector("[data-world-search]");
+    const count = document.querySelector("[data-world-search-count]");
+    const query = normalizeSearch(input ? input.value : "");
+    const tokens = searchTokens(query);
+    const cards = Array.from(document.querySelectorAll("[data-search]"));
+    let visibleCards = 0;
+
+    for (const card of cards) {
+        const matched = matchesSearch(card.dataset.search, tokens);
+        card.hidden = !matched;
+        if (matched) {
+            visibleCards += 1;
+        }
+    }
+
+    document.querySelectorAll("[data-transport-group]").forEach((group) => {
+        const hasVisible = Boolean(group.querySelector(".transport-tile:not([hidden])"));
+        const hasCards = Boolean(group.querySelector(".transport-tile"));
+        group.hidden = hasCards && !hasVisible && Boolean(query);
+    });
+
+    const visibleResults = renderSearchResults(window.currentWorldDashboard || initialWorldDashboard, tokens);
+    if (count) {
+        count.textContent = query
+            ? `${visibleResults} results · ${visibleCards} monitor cards`
+            : "";
+    }
+}
+
+function updateDashboardChrome(dashboard) {
+    const updated = document.querySelector("[data-world-updated]");
+    const count = document.querySelector("[data-transport-count]");
+    const weatherCount = document.querySelector("[data-weather-count]");
+    const feedback = document.querySelector("[data-copy-feedback]");
+    if (updated) {
+        updated.textContent = dashboard.generated_time || "Never";
+    }
+    if (count) {
+        count.textContent = String(dashboard.transport_count || 0);
+    }
+    if (weatherCount) {
+        weatherCount.textContent = `${dashboard.weather_count || 0} zones`;
+    }
+    if (feedback) {
+        feedback.textContent = `${dashboard.transport_count || 0} routes`;
+    }
+}
+
+function copyTransportCommand(button) {
+    const command = button.dataset.copyCommand || "";
+    const feedback = document.querySelector("[data-copy-feedback]");
+    copyTextToClipboard(command).then(() => {
+        button.classList.add("copied-row");
+        if (feedback) {
+            feedback.textContent = `Copied ${command}`;
+        }
+        window.setTimeout(() => button.classList.remove("copied-row"), 900);
+    }).catch(() => {
+        if (feedback) {
+            feedback.textContent = `Copy failed: ${command}`;
+        }
+    });
+}
+
+function showWorldToast(message) {
+    const toast = document.querySelector("[data-world-toast]");
+    if (!toast) {
+        return;
+    }
+    toast.textContent = message;
+    toast.hidden = false;
+    window.clearTimeout(showWorldToast.timer);
+    showWorldToast.timer = window.setTimeout(() => {
+        toast.hidden = true;
+    }, 1600);
+}
+
+function copyWeatherTeleport(button) {
+    const command = button.dataset.copyCommand || "";
+    copyTextToClipboard(command).then(() => {
+        button.classList.add("copied-row");
+        showWorldToast("Teleport copied");
+        window.setTimeout(() => button.classList.remove("copied-row"), 900);
+    }).catch(() => {
+        showWorldToast("Copy failed");
+    });
+}
+
+document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-transport-dashboard] button[data-copy-command]");
+    if (!button) {
+        return;
+    }
+    copyTransportCommand(button);
+});
+
+document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-weather-dashboard] button[data-copy-command]");
+    if (!button) {
+        return;
+    }
+    copyWeatherTeleport(button);
+});
+
+document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-copy-search-result]");
+    if (!button) {
+        return;
+    }
+    const command = button.dataset.copySearchResult || "";
+    copyTextToClipboard(command).then(() => {
+        button.classList.add("copied-row");
+        showWorldToast("Copied");
+        window.setTimeout(() => button.classList.remove("copied-row"), 900);
+    }).catch(() => {
+        showWorldToast("Copy failed");
+    });
+});
+
+document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-scroll-section]");
+    if (!button) {
+        return;
+    }
+    const target = button.dataset.scrollSection || "";
+    const selector = target === "weather" ? "[data-weather-dashboard]" : "[data-transport-dashboard]";
+    const section = document.querySelector(selector);
+    if (section) {
+        section.scrollIntoView({behavior: "smooth", block: "start"});
+    }
+});
+
+let refreshTimer = null;
+let refreshInFlight = false;
+
+async function refreshWorldRuntime() {
+    const root = document.querySelector("[data-transport-dashboard]");
+    if (!root || refreshInFlight) {
+        return;
+    }
+    refreshInFlight = true;
+    try {
+        const response = await fetch(root.dataset.runtimeUrl, {
+            headers: {"Accept": "application/json"},
+            cache: "no-store",
+        });
+        if (!response.ok) {
+            return;
+        }
+        const dashboard = await response.json();
+        window.currentWorldDashboard = dashboard;
+        renderTransportGroups(dashboard);
+        renderWeatherDashboard(dashboard);
+        updateDashboardChrome(dashboard);
+        applyWorldSearch();
+    } finally {
+        refreshInFlight = false;
+    }
+}
+
+function scheduleRefresh() {
+    const select = document.querySelector("[data-refresh-select]");
+    const delay = Number(select ? select.value : 5000) || 5000;
+    if (refreshTimer) {
+        window.clearInterval(refreshTimer);
+    }
+    refreshTimer = window.setInterval(refreshWorldRuntime, delay);
+}
+
+document.querySelectorAll("[data-refresh-select]").forEach((select) => {
+    select.addEventListener("change", () => {
+        try {
+            localStorage.setItem("worldTransportRefreshMs", select.value);
+        } catch (error) {
+        }
+        scheduleRefresh();
+        refreshWorldRuntime();
+    });
+});
+
+document.querySelectorAll("[data-world-search]").forEach((input) => {
+    let stored = "";
+    try {
+        stored = localStorage.getItem("worldDashboardSearch") || "";
+    } catch (error) {
+        stored = "";
+    }
+    input.value = stored;
+    input.addEventListener("input", () => {
+        try {
+            localStorage.setItem("worldDashboardSearch", input.value);
+        } catch (error) {
+        }
+        applyWorldSearch();
+    });
+});
+
+window.currentWorldDashboard = initialWorldDashboard;
+updateDashboardChrome(initialWorldDashboard);
+applyWorldSearch();
+scheduleRefresh();
+</script>
+{% endblock %}

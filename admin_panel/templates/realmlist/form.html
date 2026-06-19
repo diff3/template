@@ -4,37 +4,23 @@
 <section class="card">
     <h1>{% if realm %}Edit Realm #{{ realm.id }}{% else %}Create Realm{% endif %}</h1>
     <form method="post" class="form-grid">
+        {% if realm %}
         <label>
             ID
-            <input type="number" name="id" value="{{ realm.id if realm else '' }}" {% if realm %}readonly{% else %}required{% endif %}>
+            <input type="number" value="{{ realm.id }}" readonly>
         </label>
+        {% endif %}
         <label>
             Name
             <input type="text" name="name" value="{{ realm.name if realm else '' }}" required>
         </label>
         <label>
-            Address
-            <input type="text" name="address" value="{{ realm.address if realm else '' }}" required>
-        </label>
-        <label>
-            Port
-            <input type="number" name="port" value="{{ realm.port if realm else 8085 }}" required>
-        </label>
-        <label>
-            Icon
-            <input type="number" name="icon" value="{{ realm.icon if realm else 1 }}" required>
-        </label>
-        <label>
-            Flag
-            <input type="number" name="flag" value="{{ realm.flag if realm else 0 }}" required>
-        </label>
-        <label>
-            Timezone
-            <input type="number" name="timezone" value="{{ realm.timezone if realm else 1 }}" required>
-        </label>
-        <label>
-            Allowed Security Level
-            <input type="number" name="allowedSecurityLevel" value="{{ realm.allowedSecurityLevel if realm else 0 }}" required>
+            Type
+            <select name="icon" required>
+                {% for value, label in realm_types.items() %}
+                <option value="{{ value }}" {% if (realm and realm.icon == value) or (not realm and value == 1) %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
         </label>
         <div class="form-actions">
             <button type="submit">Save</button>

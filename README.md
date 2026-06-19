@@ -36,9 +36,9 @@ The proxy keeps its own JSON config, but it is now also stored under `config/`:
 Runtime data is centralized under `data/`:
 
 - `data/def` for packet definitions
-- `data/json` for expected/promoted decoded payloads
-- `data/debug` for promoted raw/debug packet dumps
-- `data/captures` for live captures and focus captures
+- `data/proxy/json` for expected/promoted decoded payloads
+- `data/proxy/debug` for promoted raw/debug packet dumps
+- `data/proxy/captures` for live captures and focus captures
 
 ## Logs
 

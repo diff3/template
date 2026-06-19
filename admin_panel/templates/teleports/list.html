@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Teleports{% endblock %}
+{% block content %}
+<section class="card" data-lazy-table>
+    <div class="section-head">
+        <h1>Teleports</h1>
+        <div class="actions">
+            <form action="{{ url_for('teleport_refresh') }}" method="post">
+                <button type="submit">Refresh cache</button>
+            </form>
+            <a class="button-link" href="{{ url_for('teleport_create') }}">Create teleport</a>
+        </div>
+    </div>
+    <div class="table-tools">
+        <label class="search-field">
+            Search
+            <input type="search" placeholder="Name, map or coordinates" autocomplete="off" data-lazy-search>
+        </label>
+        <span class="muted" data-lazy-count>{{ teleports|length }} total</span>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Map</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Z</th>
+                <th>O</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for teleport in teleports %}
+            <tr data-row-href="{{ url_for('teleport_edit', name=teleport.name) }}" data-search="{{ teleport.name|lower }} {{ teleport.map }} {{ teleport.map_name|lower }} {{ '%.2f'|format(teleport.position_x) }} {{ '%.2f'|format(teleport.position_y) }} {{ '%.2f'|format(teleport.position_z) }} {{ '%.2f'|format(teleport.orientation) }}">
+                <td>{{ teleport.name }}</td>
+                <td title="{{ teleport.map_name }}">{{ teleport.map }}</td>
+                <td>{{ "%.2f"|format(teleport.position_x) }}</td>
+                <td>{{ "%.2f"|format(teleport.position_y) }}</td>
+                <td>{{ "%.2f"|format(teleport.position_z) }}</td>
+                <td>{{ "%.2f"|format(teleport.orientation) }}</td>
+                <td class="actions">
+                    <a href="{{ url_for('teleport_edit', name=teleport.name) }}">Edit</a>
+                    <form action="{{ url_for('teleport_delete', name=teleport.name) }}" method="post" onsubmit="return confirm('Delete teleport {{ teleport.name }}?');">
+                        <button type="submit" class="danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" class="muted">No teleports found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

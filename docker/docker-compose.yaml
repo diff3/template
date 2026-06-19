@@ -1,0 +1,103 @@
+services:
+  authserver:
+    image: ${IMAGE_NAME}-authserver:${IMAGE_TAG}
+    container_name: ${CONTAINER_NAME}-authserver
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE}
+    environment:
+      SERVICE_NAME: authserver
+      TIMEZONE: ${TIMEZONE:-Europe/Stockholm}
+    ports:
+      - "${AUTH_PORT:-3720}:${AUTH_PORT:-3720}"
+    volumes:
+      - ../config:/app/config:rw
+      - ../logs:/app/logs:rw
+      - ../data/captures:/app/data/captures:rw
+      - ../data/debug:/app/data/debug:rw
+    restart: unless-stopped
+
+  worldserver:
+    image: ${IMAGE_NAME}-worldserver:${IMAGE_TAG}
+    container_name: ${CONTAINER_NAME}-worldserver
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE}
+    environment:
+      SERVICE_NAME: worldserver
+      TIMEZONE: ${TIMEZONE:-Europe/Stockholm}
+    ports:
+      - "${WORLD_PORT:-8086}:${WORLD_PORT:-8086}"
+    volumes:
+      - ../config:/app/config:rw
+      - ../logs:/app/logs:rw
+      - ../data/captures:/app/data/captures:rw
+      - ../data/debug:/app/data/debug:rw
+      - type: bind
+        source: ${DBC_HOST_PATH:-../data/client/dbc}
+        target: ${DBC_CONTAINER_PATH:-/app/data/client/dbc}
+        bind:
+          create_host_path: true
+      - type: bind
+        source: ${DB2_HOST_PATH:-../data/client/db2}
+        target: ${DB2_CONTAINER_PATH:-/app/data/client/db2}
+        bind:
+          create_host_path: true
+      - type: bind
+        source: ${MAPS_HOST_PATH:-../data/client/maps}
+        target: ${MAPS_CONTAINER_PATH:-/app/data/client/maps}
+        bind:
+          create_host_path: true
+    restart: unless-stopped
+
+  proxyserver:
+    image: ${IMAGE_NAME}-proxyserver:${IMAGE_TAG}
+    container_name: ${CONTAINER_NAME}-proxyserver
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE}
+    environment:
+      SERVICE_NAME: proxyserver
+      TIMEZONE: ${TIMEZONE:-Europe/Stockholm}
+    ports:
+      - "${PROXY_AUTH_PORT:-3724}:${PROXY_AUTH_PORT:-3724}"
+      - "${PROXY_WORLD_PORT:-8085}:${PROXY_WORLD_PORT:-8085}"
+      - "${PROXY_TELNET_PORT:-1337}:${PROXY_TELNET_PORT:-1337}"
+    volumes:
+      - ../config:/app/config:rw
+      - ../logs:/app/logs:rw
+      - ../data/captures:/app/data/captures:rw
+      - ../data/debug:/app/data/debug:rw
+    depends_on:
+      - authserver
+      - worldserver
+    restart: unless-stopped
+
+  admin_panel:
+    image: ${IMAGE_NAME}-admin-panel:${ADMIN_PANEL_IMAGE_TAG}
+    container_name: ${CONTAINER_NAME}-admin-panel
+    build:
+      context: ..
+      dockerfile: docker/admin_panel.Dockerfile
+      args:
+        ADMIN_PANEL_PYTHON_IMAGE: ${ADMIN_PANEL_PYTHON_IMAGE}
+    environment:
+      SERVICE_NAME: admin_panel
+      TIMEZONE: ${TIMEZONE:-Europe/Stockholm}
+      FLASK_ADMIN_SECRET: ${FLASK_ADMIN_SECRET:-}
+    ports:
+      - "${ADMIN_PANEL_PORT:-5001}:5001"
+    volumes:
+      - ../config:/app/config:rw
+      - ../logs:/app/logs:rw
+    restart: unless-stopped
+
+networks:
+  default:
+    name: ${CONTAINER_NAME}-network

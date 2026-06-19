@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Commands{% endblock %}
+{% block content %}
+<section class="card" data-lazy-table>
+    <div class="section-head">
+        <h1>Commands</h1>
+    </div>
+    <div class="table-tools">
+        <label class="search-field">
+            Search
+            <input type="search" placeholder="Command or usage" autocomplete="off" data-lazy-search>
+        </label>
+        <span class="muted" data-lazy-count>{{ commands|length }} total</span>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Command</th>
+                <th>Usage</th>
+                <th>Aliases</th>
+                <th>Args</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for command in commands %}
+            <tr data-search="{{ command.name|lower }} {{ command.usage|lower }} {{ command.aliases|join(' ')|lower }}">
+                <td><code>.{{ command.name }}</code></td>
+                <td><code>{{ command.usage }}</code></td>
+                <td>{% if command.aliases %}{{ command.aliases|join(", ") }}{% else %}<span class="muted">-</span>{% endif %}</td>
+                <td>
+                    {% if command.require_args %}
+                    Required
+                    {% elif command.allow_args %}
+                    Optional
+                    {% else %}
+                    None
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}
