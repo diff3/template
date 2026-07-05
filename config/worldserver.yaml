@@ -1,6 +1,6 @@
 worldserver:
   host: 0.0.0.0
-  port: 8086
+  port: 8085
   logging:
     write_to_log: true
     log_file: worldserver.log
@@ -32,3 +32,10 @@ World:
   DebugGameObjectOrientation: false
   EnableNPCs: true
   EnableNPCAutoStream: true
+
+Api:
+  EnableServer: true
+  EnableBridge: true
+  Host: 127.0.0.1
+  Port: 8090
+  Token: ""

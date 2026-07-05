@@ -4,5 +4,5 @@ client:
   os: "Win"
   country: "enGB"
   timezone: 60
-  ip: "192.168.11.30"
+  ip: "10.10.149.165"
   addons_path: "/home/magnus/Games/World of Warcraft 5.4.8 MoP/Interface/AddOns"
