@@ -5,6 +5,7 @@ server/
 shared
 logs/
 data/
+data/client/
 dbc/
 maps/
 db2/

@@ -31,10 +31,9 @@
         <h2>NPCs</h2>
         <span class="muted">Use visual id with .morph</span>
     </div>
-    <table class="lookup-table">
+    <table class="lookup-table npc-lookup-table">
         <thead>
             <tr>
-                <th>Visual</th>
                 <th>Name</th>
                 <th>ID</th>
                 <th>Visual ID</th>
@@ -44,7 +43,6 @@
         <tbody>
             {% for row in rows %}
             <tr data-search="{{ row.name|lower }} {{ row.id }} {{ row.visual_id }} {{ row.subname|default('', true)|lower }}">
-                <td><span class="visual-placeholder">NPC</span></td>
                 <td>{{ row.name }}</td>
                 <td><code>{{ row.id }}</code></td>
                 <td><code>{{ row.visual_id }}</code></td>
@@ -52,7 +50,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="5" class="muted">Search for an NPC name, id or visual id.</td>
+                <td colspan="4" class="muted">Search for an NPC name, id or visual id.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -62,10 +60,9 @@
         <h2>Game Objects</h2>
         <span class="muted">Use id for spawn/debug workflows</span>
     </div>
-    <table class="lookup-table">
+    <table class="lookup-table gameobject-lookup-table">
         <thead>
             <tr>
-                <th>Visual</th>
                 <th>Name</th>
                 <th>ID</th>
                 <th>Display ID</th>
@@ -75,7 +72,6 @@
         <tbody>
             {% for row in rows %}
             <tr data-search="{{ row.name|lower }} {{ row.id }} {{ row.visual_id }} {{ row.type }} {{ row.icon_name|default('', true)|lower }}">
-                <td><span class="visual-placeholder">GO</span></td>
                 <td>{{ row.name }}</td>
                 <td><code>{{ row.id }}</code></td>
                 <td><code>{{ row.visual_id }}</code></td>
@@ -83,7 +79,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="5" class="muted">Search for a game object name, id or display id.</td>
+                <td colspan="4" class="muted">Search for a game object name, id or display id.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -91,7 +87,7 @@
     {% else %}
     <div class="section-head">
         <h2>Items</h2>
-        <span class="muted">Use item id with .additem</span>
+        <span class="muted">Use item id with .add item</span>
     </div>
     <table class="lookup-table">
         <thead>
@@ -100,17 +96,17 @@
                 <th>Name</th>
                 <th>Item ID</th>
                 <th>Display ID</th>
-                <th>Quality</th>
+                <th>Rarity</th>
             </tr>
         </thead>
         <tbody>
             {% for row in rows %}
-            <tr data-search="{{ row.name|lower }} {{ row.id }} {{ row.visual_id }}">
-                <td><span class="visual-placeholder">Item</span></td>
+            <tr data-search="{{ row.name|lower }} {{ row.id }} {{ row.visual_id }} {{ row.icon_name }}">
+                <td><img class="item-lookup-icon" src="{{ row.icon_url }}" alt="" title="{{ row.icon_name }}" loading="lazy"></td>
                 <td>{{ row.name }}</td>
                 <td><code>{{ row.id }}</code></td>
                 <td><code>{{ row.visual_id }}</code></td>
-                <td>{{ row.quality }}</td>
+                <td>{{ row.quality_name }}</td>
             </tr>
             {% else %}
             <tr>

@@ -197,13 +197,25 @@ td .compact-form input {
 }
 
 input,
-select {
+select,
+textarea {
     padding: 0.6rem;
     border: 1px solid #c7d0db;
     border-radius: 6px;
     font: inherit;
     min-height: 2.55rem;
     box-sizing: border-box;
+}
+
+textarea {
+    min-height: auto;
+    resize: vertical;
+}
+
+.message-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
 }
 
 .checkbox,
@@ -429,6 +441,54 @@ th {
     width: 9rem;
 }
 
+.npc-lookup-table {
+    table-layout: fixed;
+}
+
+.npc-lookup-table th:nth-child(1),
+.npc-lookup-table td:nth-child(1) {
+    width: auto;
+}
+
+.npc-lookup-table th:nth-child(2),
+.npc-lookup-table td:nth-child(2) {
+    width: 7rem;
+}
+
+.npc-lookup-table th:nth-child(3),
+.npc-lookup-table td:nth-child(3) {
+    width: 8rem;
+}
+
+.npc-lookup-table th:nth-child(4),
+.npc-lookup-table td:nth-child(4) {
+    width: 28%;
+}
+
+.gameobject-lookup-table {
+    table-layout: fixed;
+}
+
+.gameobject-lookup-table th:nth-child(1),
+.gameobject-lookup-table td:nth-child(1) {
+    width: auto;
+}
+
+.gameobject-lookup-table th:nth-child(2),
+.gameobject-lookup-table td:nth-child(2) {
+    width: 7rem;
+}
+
+.gameobject-lookup-table th:nth-child(3),
+.gameobject-lookup-table td:nth-child(3) {
+    width: 8rem;
+}
+
+.gameobject-lookup-table th:nth-child(4),
+.gameobject-lookup-table td:nth-child(4) {
+    width: 4rem;
+}
+
 .visual-placeholder {
     align-items: center;
     background: #eef2f7;
@@ -442,6 +502,15 @@ th {
     justify-content: center;
     text-transform: uppercase;
     width: 3.5rem;
+}
+
+.item-lookup-icon {
+    border: 1px solid #111827;
+    border-radius: 5px;
+    display: block;
+    height: 40px;
+    object-fit: cover;
+    width: 40px;
 }
 
 .faction-dot {
@@ -1005,7 +1074,8 @@ html[data-theme="dark"] .card {
 }
 
 html[data-theme="dark"] input,
-html[data-theme="dark"] select {
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
     background: #252b32;
     border-color: #5a6674;
     color: #e2e8ef;

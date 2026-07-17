@@ -1,12 +1,12 @@
 worldserver:
   host: 0.0.0.0
-  port: 8085
+  port: 8086
   logging:
     write_to_log: true
     log_file: worldserver.log
   output:
-    raw: false
-    decode: false
+    raw: true
+    decode: true
     dsl_warnings: true
     blacklist: []
 
@@ -17,7 +17,11 @@ maps_path: "data/client/maps"
 Transport:
   EnableElevators: true
   EnableMovingTransports: true
+  DebugLifecycle: false
   DebugMovement: false
+  DebugPackets: false
+  DebugMessages: true
+  AutonomousVisibility: true
 
 Taxi:
   EnableFlightPaths: true
@@ -36,6 +40,6 @@ World:
 Api:
   EnableServer: true
   EnableBridge: true
-  Host: 127.0.0.1
+  Host: 0.0.0.0
   Port: 8090
   Token: ""

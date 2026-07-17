@@ -73,6 +73,12 @@ from admin_panel.modules.teleports import (
 from admin_panel.modules.world_state import (
     world_dashboard,
 )
+from admin_panel.modules.world_api import (
+    WorldAPIError,
+    send_system_mail,
+    send_whisper,
+    send_world_chat,
+)
 
 
 app = Flask(__name__)
@@ -132,6 +138,46 @@ def world_runtime_json():
 @require_login
 def commands_help():
     return render_template("commands.html", commands=command_rows())
+
+
+@app.route("/messages", methods=["GET", "POST"])
+@require_login
+def messages():
+    if request.method == "POST":
+        action = as_text("action")
+        try:
+            if action == "chat":
+                chat_type = as_text("chat_type") or "world"
+                target = as_text("target")
+                message = as_text("message")
+                if not message:
+                    raise ValueError("Message is required.")
+                author = str(session.get("username") or "Admin")
+                if chat_type == "whisper":
+                    if not target:
+                        raise ValueError("Player name is required for a whisper.")
+                    send_whisper(target, message, author)
+                    flash(f"Whisper queued for {target}.", "success")
+                elif chat_type == "world":
+                    send_world_chat(message, author)
+                    flash("World message queued.", "success")
+                else:
+                    raise ValueError("Invalid chat type.")
+            elif action == "mail":
+                recipient = as_text("recipient")
+                subject = as_text("subject")
+                body = as_text("body")
+                if not recipient or not subject or not body:
+                    raise ValueError("Recipient, subject and body are required.")
+                result = send_system_mail(recipient, subject, body)
+                flash(f"Mail sent to {recipient} (ID {int(result['mail_id'])}).", "success")
+            else:
+                raise ValueError("Invalid message action.")
+        except (ValueError, WorldAPIError, KeyError, TypeError) as exc:
+            flash(str(exc), "error")
+        return redirect(url_for("messages"))
+
+    return render_template("messages.html")
 
 
 @app.route("/lookup")

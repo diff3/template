@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Messages{% endblock %}
+{% block content %}
+<div class="message-grid">
+    <section class="card">
+        <div class="section-head">
+            <h1>Chat message</h1>
+        </div>
+        <p class="muted">Send a world message or a direct whisper to an online player.</p>
+        <form method="post" class="form-grid">
+            <input type="hidden" name="action" value="chat">
+            <label>
+                Channel
+                <select name="chat_type" data-chat-type>
+                    <option value="world">World</option>
+                    <option value="whisper">Whisper</option>
+                </select>
+            </label>
+            <label data-whisper-target hidden>
+                Player
+                <input type="text" name="target" maxlength="12" autocomplete="off">
+            </label>
+            <label class="full-row">
+                Message
+                <textarea name="message" rows="6" maxlength="500" required></textarea>
+            </label>
+            <div class="form-actions">
+                <button type="submit">Send chat message</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="card">
+        <div class="section-head">
+            <h1>System mail</h1>
+        </div>
+        <p class="muted">Send a persistent letter from the system to an existing character.</p>
+        <form method="post" class="form-grid">
+            <input type="hidden" name="action" value="mail">
+            <label>
+                Recipient
+                <input type="text" name="recipient" maxlength="12" autocomplete="off" required>
+            </label>
+            <label>
+                Subject
+                <input type="text" name="subject" maxlength="255" required>
+            </label>
+            <label class="full-row">
+                Body
+                <textarea name="body" rows="6" required></textarea>
+            </label>
+            <div class="form-actions">
+                <button type="submit">Send mail</button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    const chatType = document.querySelector("[data-chat-type]");
+    const whisperTarget = document.querySelector("[data-whisper-target]");
+    function updateChatTarget() {
+        const whisper = chatType.value === "whisper";
+        whisperTarget.hidden = !whisper;
+        whisperTarget.querySelector("input").required = whisper;
+    }
+    chatType.addEventListener("change", updateChatTarget);
+    updateChatTarget();
+</script>
+{% endblock %}

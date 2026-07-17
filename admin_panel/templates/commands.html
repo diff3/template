@@ -17,16 +17,16 @@
             <tr>
                 <th>Command</th>
                 <th>Usage</th>
-                <th>Aliases</th>
+                <th>Description</th>
                 <th>Args</th>
             </tr>
         </thead>
         <tbody>
             {% for command in commands %}
-            <tr data-search="{{ command.name|lower }} {{ command.usage|lower }} {{ command.aliases|join(' ')|lower }}">
+            <tr data-search="{{ command.name|lower }} {{ command.usage|lower }} {{ command.description|lower }}">
                 <td><code>.{{ command.name }}</code></td>
                 <td><code>{{ command.usage }}</code></td>
-                <td>{% if command.aliases %}{{ command.aliases|join(", ") }}{% else %}<span class="muted">-</span>{% endif %}</td>
+                <td>{{ command.description }}</td>
                 <td>
                     {% if command.require_args %}
                     Required
